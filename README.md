@@ -30,13 +30,21 @@ The pipeline is built in such a way that the `solrAdd` step finalises the ingest
 
 ## Preparations
 
+To prepare the `backend server`'s setup, it is mandatory to have a running SOLR instance, prepared with the appropriate schema and plugin.
+
 ## Install
+
+Installation of the development enviornment is done by calling ```npm install`, as this is a node project.
 
 # Customization
 
 ## General
 
+Custom elements for the pipeine can be added as described in the [archival-iiif-server](https://github.com/archival-IIIF/server) documentation.
+
 ## Run tests
+
+There aren't any automated tests available. End to end runs have to be manually checked.
 
 ## Execute
 

@@ -16,7 +16,7 @@ The _backend server_ has two major tasks: _ingestion_ and _search routing_. The 
 
 ## Pipeline Ingestion
 
-![Pipeline](docs/images/brprotokolle-server-pipeline.png)
+![Pipeline](doc/images/brprotokolle-server-pipeline.png)
 
 The ingestion pipline handles either _handwritten minutes_ (e.g. with provided OCR from the Transkribus project) or _machine written minutes_ (e.g. as PDF files, no OCR provided), enhances the minutes with provided metadata and ultimately stores relevant information in a SOLR instance.
 In order to start the ingestion, files in the appropriate format have to be added to the `HOTFOLDER`, which the `dirWatcher` catches. Then, depending on the type of minutes the `collectionBuilder` handles _handwritten minutes_ for further processing. _Machine written minutes_ are ingested as single PDFs, thus before further processing, the images have to be extracted (`imgExtractor`) and subsequently, OCR is extracted based on the images (`ocrExtractor`).
@@ -46,8 +46,6 @@ Custom elements for the pipeine can be added as described in the [archival-iiif-
 
 There aren't any automated tests available. End to end runs have to be manually checked.
 
-## Execute
-
 # Authors
 
 - [Schweizerisches Sozialarchiv](https://www.sozialarchiv.ch/)
@@ -55,7 +53,7 @@ There aren't any automated tests available. End to end runs have to be manually 
 
 # License
 
-The MIT License (MIT), see [LICENSE](LICENSE)
+GNU Affero General Public License (AGPLv3), see [LICENSE](LICENSE)
 
 # Contribute
 

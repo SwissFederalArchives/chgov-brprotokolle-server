@@ -4,7 +4,7 @@
   - **[chgov-brprotokolle-server](https://github.com/SwissFederalArchives/chgov-brprotokolle-server)** :triangular_flag_on_post:
   - [chgov-brprotokolle-markdown](https://github.com/SwissFederalArchives/chgov-brprotokolle-markdown)
   - [chgov-brprotokolle-frontend](https://github.com/SwissFederalArchives/chgov-brprotokolle-frontend)
-  - [chgov-brprotokolle-mirador-ocr-helper](https://github.com/SwissFederalArchives/chgov-brprotokolle-mirador-ocr-helper)
+  - [chgov-brprotokolle-ocr](https://github.com/SwissFederalArchives/chgov-brprotokolle-ocr)
 
 # Context
 
@@ -34,7 +34,7 @@ To prepare the `backend server`'s setup, it is mandatory to have a running SOLR 
 
 ## Install
 
-Installation of the development enviornment is done by calling ```npm install`, as this is a node project.
+Installation of the development enviornment is done by calling ```npm install```, as this is a node project.
 
 # Customization
 

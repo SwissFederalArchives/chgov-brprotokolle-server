@@ -42,7 +42,7 @@
     "fsp-xml-parser": "^1.0.0",
     "got": "10.2.2",
     "handy-redis": "1.7.0",
-    "hummus": "1.0.110",
+    "hummus": "1.0.112",
     "iconv-lite": "0.5.0",
     "image-size": "^0.8.3",
     "koa": "2.11.0",

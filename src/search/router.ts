@@ -1,85 +1,168 @@
-import {DefaultState} from 'koa';
+import {Context} from 'koa';
 import Router from '@koa/router';
 
-import HttpError from '../lib/HttpError.js';
-import {Item} from '../lib/ItemInterfaces.js';
-import {ExtendedContext} from '../lib/Koa.js';
-import {getChildItems, getItem} from '../lib/Item.js';
-import {Text, getText, getTextsForCollectionId, withTexts} from '../lib/Text.js';
+import logger from '../lib/Logger';
+import config from '../lib/Config';
+import axios from "axios";
+import * as _ from "lodash";
+import * as querystring from "querystring";
+import * as crypto from "crypto";
 
-import {getSearch, getAutocomplete} from '../builder/PresentationBuilder.js';
-import {searchInCollection, searchInText, autoCompleteForCollection, autocompleteForText} from './search.js';
+export const router = new Router({prefix: '/iiif/search'}),
+    EM_PATTERN = new RegExp("<em>(.+?)</em>"),
+    RESPONSE_TEMPLATE = {
+    "@context":[
+        "https://iiif.io/api/presentation/3/context.json",
+        "https://iiif.io/api/search/1/context.json"
+    ],
+    "@id": '',
+    "@type":"sc:AnnotationList",
 
-export const router = new Router<DefaultState, ExtendedContext>({prefix: '/iiif/search'});
+    "within": {
+        "@type": "sc:Layer",
+        "total": 0,
+        "ignored": [] as any
+    },
 
-const ignored = (query: { [key: string]: any }) =>
-    Object.keys(query).filter(key => ['motivation', 'date', 'user'].includes(key));
+    "resources": [] as any,
+    "hits": [] as any
+};
 
-router.use(async (ctx, next) => {
-    if (!ctx.queryFirst('q'))
-        throw new HttpError(400, 'Query is missing!');
-    await next();
-});
+router.get('/manifest/:id', async ctx => {
+    logger.info(`Received a search request for ${ctx.params.id}`);
 
-router.get('/:id', async ctx => {
-    const item = await getItem(ctx.params.id);
-    const text = await getText(ctx.params.id);
-    if (!item && !text)
-        throw new HttpError(404, `No item found for id ${ctx.params.id}`);
-
-    const id = item ? item.collection_id : (text as Text).id;
-    const items = item ? await getChildItems(item) : [await getItem((text as Text).item_id) as Item];
-
-    const searchResults = item
-        ? await searchInCollection(ctx.queryFirst('q') as string, id)
-        : await searchInText(ctx.queryFirst('q') as string, id);
-
+    ctx.body = JSON.stringify(await search(ctx, ctx.params.id));
     ctx.set('Content-Type', 'application/json');
-    ctx.body = getSearch(searchResults, ctx.queryFirst('q') as string, ignored(ctx.query), items, id);
+
+    logger.info(`Sending a IIIF collection with id ${ctx.params.id}`);
 });
 
-router.get('/:id/:type(/:language)?', async ctx => {
-    const texts = await withTexts(getTextsForCollectionId(ctx.params.id, ctx.params.type, ctx.params.language));
-    if (!texts || texts.length === 0)
-        throw new HttpError(404,
-            `No text found of type ${ctx.params.type} and language ${ctx.params.language} for item with id ${ctx.params.id}`);
+router.get('/solr/', async ctx => {
+    logger.info(`Received a solr request`);
+    const solrBase = `http://${config.solr!.host}:${config.solr!.port}/solr/ocr`,
+        solrUrl = solrBase + "/select?" + ctx.querystring;
 
-    const collectionItem = await getItem(ctx.params.id);
-    const items = await getChildItems(collectionItem as Item);
+    try {
+        const response = await axios.get(solrUrl);
 
-    const searchResults = await searchInCollection(
-        ctx.queryFirst('q') as string, texts[0].collection_id, texts[0].type, texts[0].language);
-
-    ctx.set('Content-Type', 'application/json');
-    ctx.body = getSearch(searchResults, ctx.queryFirst('q') as string, ignored(ctx.query),
-        items, texts[0].collection_id, texts[0].type, texts[0].language);
+        ctx.body = response.data;
+        ctx.set('Content-Type', 'application/json');
+    } catch (error) {
+        logger.error('Error', error as any);
+        ctx.body = '{error: ' + (error as any) + '}';
+    }
 });
 
-router.get('/autocomplete/:id', async ctx => {
-    const item = await getItem(ctx.params.id);
-    const text = await getText(ctx.params.id);
-    if (!item && !text)
-        throw new HttpError(404, `No item found for id ${ctx.params.id}`);
+async function search(ctx: Context, docId: string) : Promise<object> {
+    const query = ctx.request.query.q as string,
+        fq = docId ? `source:${docId}` : '*:*',
+        response = await querySolr(query, fq);
 
-    const autocompleteResult = item
-        ? await autoCompleteForCollection(ctx.queryFirst('q') as string, item.collection_id)
-        : await autocompleteForText(ctx.queryFirst('q') as string, text ? text.id : '');
+    logger.debug('query: ' + query + ', docid: ' + docId);
 
-    ctx.set('Content-Type', 'application/json');
-    ctx.body = getAutocomplete(autocompleteResult, ctx.queryFirst('q') as string, ignored(ctx.query),
-        item ? item.collection_id : (text ? text.id : ''));
-});
+    let ignoredParams : any[] = [];
+    return makeResponse(response, ignoredParams, docId, query);
+}
 
-router.get('/autocomplete/:id/:type(/:language)?', async ctx => {
-    const texts = await withTexts(getTextsForCollectionId(ctx.params.id, ctx.params.type, ctx.params.language));
-    if (!texts || texts.length === 0)
-        throw new HttpError(404,
-            `No text found of type ${ctx.params.type} and language ${ctx.params.language} for item with id ${ctx.params.id}`);
+async function querySolr(query: string, fq: string) : Promise<object> {
+    const params = {
+        'q': query,
+        'df': 'ocr_text',
+        'fq': fq,
+        'rows': 500,
+        'hl': 'on',
+        'hl.ocr.fl': 'ocr_text',
+        'hl.snippets': 4096,
+        'hl.weightMatches': 'true',
+    };
 
-    const autocompleteResult = await autoCompleteForCollection(
-        ctx.queryFirst('q') as string, texts[0].collection_id, texts[0].type, texts[0].language);
+    let out = {
+        'numTotal': 0,
+        'snippets': [] as any
+    },
+    solrBase = `http://${config.solr!.host}:${config.solr!.port}/solr/ocr`,
+    solrUrl = solrBase + "/select?" + querystring.stringify(params);
 
-    ctx.set('Content-Type', 'application/json');
-    ctx.body = getAutocomplete(autocompleteResult, ctx.queryFirst('q') as string, ignored(ctx.query),
-        texts[0].collection_id, texts[0].type, texts[0].language);
-});
+    try {
+        const response = await axios.get(solrUrl),
+            ocrHighlighting = response.data.ocrHighlighting,
+            docs:any[] = response.data.response.docs;
+
+        _.forIn(ocrHighlighting, function (document: any, documentId: string) {
+
+            const doc = docs.find(d => d.id === documentId );
+            _.each(document.ocr_text.snippets, function (snippet: any) {
+                snippet.documentId = documentId;
+                snippet.collectionId = doc.source;
+                out.snippets.push(snippet);
+            });
+            out.numTotal += document.ocr_text.numTotal;
+        });
+
+    } catch (error) {
+        logger.error('Error', error as any);
+    }
+
+    return out;
+}
+
+async function makeResponse(hlresp: any, ignored_fields: any[], volId: string, query: string) : Promise<object> {
+    let doc = _.cloneDeep(RESPONSE_TEMPLATE);
+
+    doc['@id'] = config.manifestSearchUrl + volId + '?q=' + query;
+    doc.within.total = hlresp['numTotal'];
+    doc.within.ignored = ignored_fields;
+
+    _.each(hlresp.snippets, function (snippet: any, idx: number){
+        const match = snippet.text.match(EM_PATTERN),
+            text = match[1],
+            before = snippet.text.substr(0, match.index),
+            after = snippet.text.substr(match.index + match[0].length);
+
+        _.each(snippet.highlights, function (highlight:any) {
+            let annoIds: string[] = [];
+
+            _.each(highlight, function (highlightBox:any) {
+                /**
+                 * AB 29.12.2022: Hotfix due to improperly scaled ocr information with pdfalto tool
+                 */
+                let DPI_FACTOR = 1;
+                const firstMwDocId = 32324175;
+                const id = Number.parseInt(snippet.documentId.substr(0,"32324175".length));
+                if(id >= firstMwDocId){
+                    DPI_FACTOR = 150 / 72;
+                }
+
+                const ident = config.manifestSearchUrl + snippet.documentId + '/annotation/' +crypto.randomBytes(16).toString("hex"),
+                    x = Math.floor(snippet.regions[highlightBox.parentRegionIdx].ulx * DPI_FACTOR + highlightBox.ulx * DPI_FACTOR),
+                    y = Math.floor(snippet.regions[highlightBox.parentRegionIdx].uly * DPI_FACTOR + highlightBox.uly * DPI_FACTOR),
+                    w = Math.floor(highlightBox.lrx * DPI_FACTOR - highlightBox.ulx * DPI_FACTOR),
+                    h = Math.floor(highlightBox.lry * DPI_FACTOR - highlightBox.uly * DPI_FACTOR);
+
+                annoIds.push(ident);
+
+                doc.resources.push({
+                    "@id": ident,
+                    "@type": "oa:Annotation",
+                    "motivation": "sc:painting",
+                    "resource": {
+                        "@type": "cnt:ContentAsText",
+                        "chars": highlightBox.text
+                    },
+                    "on": config.imageServerUrl + '/iiif/2/' + encodeURIComponent(
+                        snippet.collectionId + '/' + snippet.documentId) + '.jpg#xywh=' + x + ',' + y + ',' + w + ','+ h
+                });
+            });
+
+            doc.hits.push({
+                '@type': 'search:Hit',
+                'annotations': annoIds,
+                'match': text,
+                'before': before,
+                'after': after,
+            });
+        });
+    });
+
+    return doc;
+}

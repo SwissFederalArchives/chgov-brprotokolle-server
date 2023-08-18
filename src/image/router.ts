@@ -130,30 +130,6 @@ router.get('/:id/:region/:size/:rotation/:quality.:format', async (ctx: ImageCon
         ctx.redirect(`${prefix}/${id}${config.imageTierSeparator}${access.tier.name}/${ctx.params.region}/${ctx.params.size}/${ctx.params.rotation}/${ctx.params.quality}.${ctx.params.format}`);
         return;
     }
-
-    if (item.type === 'image') {
-        const imageItem = item as ImageItem;
-        const size = access.tier
-            ? Image.computeMaxSize(access.tier, imageItem.width, imageItem.height)
-            : {width: imageItem.width, height: imageItem.height};
-
-        const requestedSize = parseSize(ctx.params.size, size);
-        if (requestedSize && (requestedSize.width > size.width || requestedSize.height > size.height)) {
-            ctx.redirect(`${prefix}/${ctx.params.id}/${ctx.params.region}/max/${ctx.params.rotation}/${ctx.params.quality}.${ctx.params.format}`);
-            return;
-        }
-    }
-
-    const max = item.type === 'image' && access.tier ? access.tier.maxSize : null;
-    const image = await getImage(item, derivative, max, ctx.params);
-
-    ctx.body = image.image;
-    ctx.status = image.status;
-    if (image.contentType) ctx.set('Content-Type', image.contentType);
-    if (image.contentLength) ctx.set('Content-Length', String(image.contentLength));
-    ctx.set('Content-Disposition', `inline; filename="${ctx.params.id}-${ctx.params.region}-${ctx.params.size}-${ctx.params.rotation}-${ctx.params.quality}.${ctx.params.format}"`);
-
-    logger.info(`Sending an image with id ${id} and tier ${tier}`);
 });
 
 async function getItemAndDerivative(id: string, tier: string): Promise<[Item, DerivativeType | null]> {

@@ -13,7 +13,10 @@
     "esModuleInterop": true,
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true,
-    "sourceMap": true
+    "sourceMap": true,
+    "paths": {
+      "got": ["./node_modules/got/dist/source"]
+    }
   },
   "exclude": [
     "node_modules"

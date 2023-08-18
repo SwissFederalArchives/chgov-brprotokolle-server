@@ -1,0 +1,158 @@
+version: '3'
+
+services:
+  redis:
+    image: redis:5
+    restart: always
+    ports:
+      - "6380:6379"
+    expose:
+      - "6379"
+    networks:
+      - back-tier
+
+  solr:
+    build: solr
+    ports:
+      - "1044:1044"  # Debugging port
+      - "8983:8983"  # Solr admin interface
+    volumes:
+      - ./solr/core:/opt/core-config
+      - index-data:/var/solr/data
+      - ./data:/data
+    environment:
+      - ENABLE_REMOTE_JMX_OPTS=true
+      - SOLR_HEAP=4g
+      - SOLR_ADDL_ARGS="-Xdebug -Xrunjdwp:transport=dt_socket,server=y,suspend=n,address=1044"
+    entrypoint:
+      - docker-entrypoint.sh
+      - solr-precreate
+      - ocr
+      - /opt/core-config
+    networks:
+      - front-tier
+      - back-tier
+
+  cantaloupe-image:
+    image: lyrasis/cantaloupe:latest
+    restart: always
+    environment:
+      - NODE_ENV=production
+      - IIIF_SERVER_SERVICES=image
+      - FILESYSTEMSOURCE_BASICLOOKUPSTRATEGY_PATH_PREFIX=/cantaloupe/images/collections/images/
+    ports:
+      - "8182:8182"
+    volumes:
+      - data:/cantaloupe/images
+    networks:
+      - front-tier
+      - back-tier
+
+  worker:
+    build: .
+    restart: always
+    environment:
+      - NODE_ENV=production
+      - IIIF_SERVER_SERVICES=neat-directory-watcher-changes,neat-metadata,neat-file-extractor,neat-manifest-creator,neat-ocr-index
+      - IIIF_SERVER_SECRET=cdvwybmlho3tncqhx47cbe
+      - IIIF_SERVER_ACCESS_TOKEN=cdvwybmlho3tncqhx47cbe
+      - IIIF_SERVER_UNIVERSAL_VIEWER_PATH=/opt/universalviewer
+      - IIIF_SERVER_ARCHIVAL_VIEWER_PATH=/opt/viewer
+      - IIIF_SERVER_UNIVERSAL_VIEWER_CONFIG_PATH=/opt/universalviewer-config.json
+      - IIIF_SERVER_IMAGE_SERVER_URL=http://localhost:8182
+      - IIIF_SERVER_MANIFEST_SERVER_URL=http://localhost:3000/manifests
+      - IIIF_SERVER_MANIFEST_SEARCH_URL=http://localhost:8000/iiif/search/manifest/
+      - IIIF_SERVER_AUDIOVIDEO_SERVER_URL=http://localhost:3000/audiovideo
+      - IIIF_SERVER_ICONS_SERVER_URL=http://localhost:3000/icons
+      - IIIF_SERVER_METADATA_OAI_URL=http://localhost/oai
+      - IIIF_SERVER_METADATA_SRW_URL=http://localhost/srw
+      - IIIF_SERVER_IMAGE_TIER_SEPARATOR=_
+      - IIIF_SERVER_CACHE_DISABLED=false
+      - IIIF_SERVER_PORT=3333
+      - IIIF_SERVER_LOGO=/path/to/logo.jpg
+      - IIIF_SERVER_ATTRIBUTION=Provided by
+      - IIIF_SERVER_BASE_URL=http://localhost:32000
+      - IIIF_SERVER_HOT_FOLDER_PATH=/data/media/protocols
+      - IIIF_SERVER_HOT_FOLDER_PATTERN=CH\-BAR.*
+      - IIIF_SERVER_DATA_ROOT_PATH=/data/media
+      - IIIF_SERVER_COLLECTIONS_REL_PATH=collections
+      - IIIF_SERVER_LOGO_REL_PATH=logo.png
+      - IIIF_SERVER_LOGO_DIM=100:150
+      - IIIF_SERVER_LOG_LEVEL=debug
+      - IIIF_SERVER_INTERNAL_IP_ADDRESSES=
+      - IIIF_SERVER_LOGIN_DISABLED=true
+      - IIIF_SERVER_ELASTICSEARCH_URL=http://localhost:9200
+      - IIIF_SERVER_REDIS_DISABLED=false
+      - IIIF_SERVER_REDIS_HOST=redis
+      - IIIF_SERVER_REDIS_PORT=6379
+      - IIIF_SERVER_SOLR_HOST=solr
+      - IIIF_SERVER_SOLR_PORT=8983
+      - IIIF_SERVER_MYSQL_HOST=192.168.1.20
+      - IIIF_SERVER_MYSQL_USER=shared
+      - IIIF_SERVER_MYSQL_PASS=shared
+      - IIIF_SERVER_MYSQL_PORT=3306
+      - IIIF_SERVER_MYSQL_DB=olr_shared
+      - IIIF_SERVER_MAX_TASKS_PER_WORKER=5
+      - IIIF_SERVER_WAITING_MINUTES_BEFORE_INDEXING=1
+      - IIIF_SERVER_INDEXING_INTERVAL_MS=10000
+    volumes:
+      - data:/data/media
+    networks:
+      - back-tier
+
+  web:
+    build: .
+    restart: always
+    environment:
+      - NODE_ENV=production
+      - IIIF_SERVER_SERVICES=web
+      - IIIF_SERVER_SECRET=cdvwybmlho3tncqhx47cbe
+      - IIIF_SERVER_ACCESS_TOKEN=cdvwybmlho3tncqhx47cbe
+      - IIIF_SERVER_UNIVERSAL_VIEWER_PATH=/opt/universalviewer
+      - IIIF_SERVER_ARCHIVAL_VIEWER_PATH=/opt/viewer
+      - IIIF_SERVER_UNIVERSAL_VIEWER_CONFIG_PATH=/opt/universalviewer-config.json
+      - IIIF_SERVER_IMAGE_SERVER_URL=http://localhost:8182
+      - IIIF_SERVER_METADATA_OAI_URL=http://localhost/oai
+      - IIIF_SERVER_METADATA_SRW_URL=http://localhost/srw
+      - IIIF_SERVER_IMAGE_TIER_SEPARATOR=_
+      - IIIF_SERVER_CACHE_DISABLED=false
+      - IIIF_SERVER_PORT=3333
+      - IIIF_SERVER_LOGO=/path/to/logo.jpg
+      - IIIF_SERVER_ATTRIBUTION=Provided by
+      - IIIF_SERVER_BASE_URL=http://localhost:3333
+      - IIIF_SERVER_HOT_FOLDER_PATH=/data/media
+      - IIIF_SERVER_HOT_FOLDER_PATTERN=METS\..*\.xml
+      - IIIF_SERVER_DATA_ROOT_PATH=/data
+      - IIIF_SERVER_COLLECTIONS_REL_PATH=collections
+      - IIIF_SERVER_LOGO_REL_PATH=logo.png
+      - IIIF_SERVER_LOGO_DIM=100:150
+      - IIIF_SERVER_LOG_LEVEL=debug
+      - IIIF_SERVER_INTERNAL_IP_ADDRESSES=
+      - IIIF_SERVER_LOGIN_DISABLED=true
+      - IIIF_SERVER_ELASTICSEARCH_URL=http://localhost:9200
+      - IIIF_SERVER_REDIS_DISABLED=false
+      - IIIF_SERVER_REDIS_HOST=redis
+      - IIIF_SERVER_REDIS_PORT=6379
+      - IIIF_SERVER_SOLR_HOST=solr
+      - IIIF_SERVER_SOLR_PORT=8983
+    ports:
+      - "8000:3333"
+    volumes:
+      - data:/data/media
+    networks:
+      - front-tier
+      - back-tier
+
+volumes:
+  data:
+    driver: local
+    driver_opts:
+      type: nfs
+      o: "addr=host.docker.internal,hard,nolock,rw"
+      device: ":/System/Volumes/Data/Users/${USER}/projects/neat-iiif-server/data/media/"
+  indexes:
+  index-data:
+
+networks:
+  front-tier:
+  back-tier:

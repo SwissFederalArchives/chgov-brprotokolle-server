@@ -65,7 +65,7 @@ export async function onTask<A, R>(type: string, process: (args: A) => Promise<R
 async function waitForReady(client: RedisClientType): Promise<void> {
     try {
         await client.ping();
-        await getEsClient().ping();
+        //await getEsClient().ping();
 
         logger.debug('Both Redis and ElasticSearch are now ready');
     }

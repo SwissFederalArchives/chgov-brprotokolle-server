@@ -6,19 +6,32 @@ import HttpError from '../lib/HttpError.js';
 import {runTask} from '../lib/Task.js';
 import {workerStatus} from '../lib/Worker.js';
 import {ExtendedContext} from '../lib/Koa.js';
-import {hasAdminAccess, getIpAddress} from '../lib/Security.js';
+import {getIpAddress} from '../lib/Security.js';
 import {EmptyParams, CollectionPathParams, MetadataParams, ProcessUpdateParams, ReindexParams} from '../lib/ServiceTypes.js';
 
-import registerToken from './register_token.js';
-import indexCollection from './api_index.js';
+import config from "../lib/Config";
 
 export const router = new Router<DefaultState, ExtendedContext>({prefix: '/admin'});
 
 router.use(async (ctx, next) => {
-    if (!hasAdminAccess(ctx))
+    const validToken = config.accessToken.toLowerCase();
+ 
+    const bodyToken = typeof (ctx.request.body as any)?.access_token === 'string' 
+        ? (ctx.request.body as any).access_token.toLowerCase() 
+        : undefined;
+
+    const queryToken = typeof (ctx.query as any).access_token === 'string' 
+        ? (ctx.query as any).access_token.toLowerCase() 
+        : undefined;
+
+    const headerToken = typeof ctx.headers.authorization === 'string' ? ctx.headers.authorization.replace('Bearer', '').trim().toLowerCase() : undefined;
+ 
+    if (!(bodyToken === validToken || queryToken === validToken || headerToken === validToken)) {
         throw new HttpError(403, 'Access denied');
+    }
+ 
     await next();
-});
+ });
 
 router.get('/worker_status', async ctx => {
     ctx.body = await workerStatus();
@@ -31,11 +44,12 @@ router.get('/headers', async ctx => {
         ip: getIpAddress(ctx),
     };
 });
-
+/*
 router.post('/index_api', async ctx => {
     await indexCollection(ctx.request.body as object);
     ctx.body = 'Successfully indexed the collection!';
 });
+*/
 
 router.post('/index', async ctx => {
     const body = ctx.request.body as Record<'path', string | undefined>;
@@ -45,7 +59,7 @@ router.post('/index', async ctx => {
     if (!existsSync(body.path))
         throw new HttpError(400, `The provided path "${body.path}" does not seem to exist`);
 
-    runTask<CollectionPathParams>('index', {collectionPath: body.path});
+    runTask<CollectionPathParams>('metadata', {collectionPath: body.path});
     ctx.body = 'Collection is sent to the queue for indexing';
 });
 
@@ -96,8 +110,9 @@ router.post('/process_update', async ctx => {
 
     ctx.body = 'Process update triggered';
 });
-
+/*
 router.post('/register_token', async ctx => {
     const body = ctx.request.body as Record<'token' | 'id' | 'from' | 'to', string | undefined>;
     ctx.body = await registerToken(body.token, body.id, body.from, body.to);
 });
+*/

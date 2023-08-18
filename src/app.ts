@@ -36,16 +36,19 @@ async function startWeb() {
     const {default: bodyParser} = await import('koa-bodyparser');
     const {default: compress} = await import('koa-compress');
 
-    const {router: iiifImageRouter} = await import('./image/router.js');
+    // be aware before enabling, check cpu
+    // const {router: iiifImageRouter} = await import('./image/router.js');
+    /*
     const {router: iiifPresentationRouter} = await import('./presentation/router.js');
-    const {router: iiifSearchRouter} = await import('./search/router.js');
     const {router: iiifAuthRouter} = await import('./authentication/router.js');
     const {router: fileRouter} = await import('./file/router.js');
+    */
     const {router: pdfRouter} = await import('./pdf/router.js');
     const {router: textRouter} = await import('./text/router.js');
     const {router: helperRouter} = await import('./helper/router.js');
     const {router: adminRouter} = await import('./admin/router.js');
     const {router: staticRouter} = await import('./static/router.js');
+    const {router: iiifSearchRouter} = await import('./search/router.js');
 
     const app = new Koa<DefaultState, ExtendedContext>();
 
@@ -92,12 +95,14 @@ async function startWeb() {
     app.use(json({pretty: false, param: 'pretty'}));
     app.use(bodyParser());
 
+    /*
     app.use(iiifImageRouter.routes());
     app.use(iiifPresentationRouter.routes());
-    app.use(iiifSearchRouter.routes());
     app.use(iiifAuthRouter.routes());
 
     app.use(fileRouter.routes());
+    */
+    app.use(iiifSearchRouter.routes());
     app.use(pdfRouter.routes());
     app.use(textRouter.routes());
     app.use(helperRouter.routes());

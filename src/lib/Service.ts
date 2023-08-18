@@ -176,7 +176,116 @@ export const allServices: Service[] = [{
         cron: '58 11 * * *',
         loadService: async () => (await import('../service/iish/metadata_update.js')).default
     } as CronImplementationService]
-}];
+},  {
+    type: 'watcher',
+    runAs: 'standalone',
+    implementations: [{
+        name: 'neat-directory-watcher-changes',
+        loadService: async () => (await import('../service/neat_directory_watcher_changes.js')).default
+    }]
+}, {
+    type: 'file-extract',
+    runAs: 'worker',
+    implementations: [{
+        name: 'neat-file-extractor',
+        loadService: async () => (await import('../service/neat_file_extractor.js')).default
+    }]
+}, {
+    type: 'manifest',
+    runAs: 'worker',
+    implementations: [{
+        name: 'neat-manifest-creator',
+        loadService: async () => (await import('../service/neat_manifest_create.js')).default
+    }]
+}, {
+    type: 'ocr-index',
+    runAs: 'worker',
+    implementations: [{
+    name: 'neat-ocr-index',
+    loadService: async () => (await import('../service/neat_ocr_index.js')).default
+    }]
+}, {
+    type: 'metadata',
+    runAs: 'worker',
+    implementations: [{
+    name: 'neat-metadata',
+    loadService: async () => (await import('../service/neat_metadata.js')).default
+    }]
+}, {
+    type: 'brp-watcher',
+    runAs: 'standalone',
+    implementations: [{
+        name: 'brp-dir-watcher',
+        loadService: async () => (await import('../service/brp_directory_watcher_changes.standalone.js')).default
+    }]
+}, {
+    type: 'brp-builder',
+    runAs: 'worker',
+    implementations: [{
+        name: 'brp-collection-builder',
+        loadService: async () => (await import('../service/brp_collection_builder.task.js')).default
+    }]
+},{
+    type: 'brp-ocr-indexer',
+    runAs: 'worker',
+    implementations: [{
+        name: 'brp-ocr-indexer',
+        loadService: async () => (await import('../service/brp_ocr_indexer.task.js')).default
+    }]
+},{
+    type: 'brp-manifest',
+    runAs: 'worker',
+    implementations: [{
+        name: 'brp-manifest-creater',
+        loadService: async () => (await import('../service/brp_manifest_creater.task.js')).default
+    }]
+},/*{ // Deprecated since brp_root_collection_manifest_builder
+    name: 'brp-root-manifest-creater',
+    type: 'brp-root-manifest',
+    runAs: 'worker',
+    getService: () => require('../service/brp_collection_manifest_builder.task').default
+},*/{
+    type: 'brp-image-extract',
+    runAs: 'worker',
+    implementations: [{
+        name: 'brp-pdf-to-image-extracter',
+        loadService: async () => (await import('../service/brp_pdf_to_images_extractor.task.js')).default
+    }]
+},{
+    type: 'brp-ocr-extract',
+    runAs: 'worker',
+    implementations: [{
+        name: 'brp-ocr-extracter',
+        loadService: async () => (await import('../service/brp_ocr_extracter.task.js')).default
+    }]
+
+},{
+    type: 'brp-root-manifest',
+    runAs: 'standalone',
+    implementations: [{
+        name: 'brp-root-manifest-creater',
+        loadService: async () => (await import('../service/brp_root_collection_manifest_builder.standalone.js')).default
+    }]
+},{
+    type: 'brp-hocr-plaintext-extract',
+    runAs: 'worker',
+    implementations: [{
+        name: 'brp-hocr-to-plaintext-extracter',
+        loadService: async () => (await import('../service/brp_hocr_to_plaintext_extractor.task.js')).default
+    }]
+}
+    /*
+    * Definition of brp-ads-indexer service Single use, produces ads-index.csv
+    * disabled here, to prevent unnecessary rewrites
+    */
+    /*
+    {
+        name: 'brp-ads-indexer',
+        type: 'ads-indexer',
+        runAs: 'standalone',
+        getService: () => require('../service/brp_ads_signature_indexer.standalone').default
+    }*/
+];
 
 export let isRunningWeb: boolean = config.services.find(name => name.toLowerCase() === 'web') != undefined;
 export let workersRunning: { [type: string]: ImplementationService } = {};

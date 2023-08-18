@@ -6,6 +6,8 @@ import HttpError from '../lib/HttpError.js';
 import {ExtendedContext} from '../lib/Koa.js';
 import {fileIconsPath} from '../lib/FileIcon.js';
 
+import logger from '../lib/Logger';
+
 export const router = new Router<DefaultState, ExtendedContext>();
 
 router.use(async (ctx, next) => {
@@ -27,4 +29,13 @@ router.get('/iiif-explorer:path(.*)?', async ctx => {
 
 router.get('/file-icon:path(.*)', async ctx => {
     await send(ctx, ctx.params.path, {root: fileIconsPath});
+});
+
+router.get('/d1476b3e122b2821ec33a00195456c74.txt', async ctx => {
+    logger.info(`Received a owasp request`);
+
+    ctx.body = "detectify";
+    ctx.set('Content-Type', 'text/plain');
+
+    logger.info(`Sending owasp enabling text`);
 });

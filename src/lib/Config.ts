@@ -1,9 +1,4 @@
-if (process.env.NODE_ENV === 'test') {
-    const dotenv = await import('dotenv');
-    dotenv.config({path: '.test.env'});
-}
-else if (process.env.NODE_ENV !== 'production')
-    await import('dotenv/config');
+await import('dotenv/config');
 
 const isEnabled = (value?: string): boolean => !value || value === '1' || value.toLowerCase() === 'true';
 
@@ -23,6 +18,10 @@ export interface Config {
     ipAddressHeader?: string;
     imageServerUrl: string;
     imageServerName: 'loris' | 'sharp';
+    audioVideoServerUrl?: string;
+    manifestServerUrl?: string;
+    manifestSearchUrl?: string;
+    iconsServerUrl?: string;
     logoDimensions?: [number, number];
     audioDimensions?: [number, number];
     viewerUrl: string;
@@ -35,6 +34,8 @@ export interface Config {
     imageTierSeparator: string;
     maxTasksPerWorker: number;
     maxSearchResults: number;
+    waitingMinutesBeforeIndexing: number;
+    indexingInterval: number;
     services: string[];
     secret: string;
     accessToken: string;
@@ -46,6 +47,10 @@ export interface Config {
     derivativeRelativePath: string;
     internalIpAddresses: string[];
     loginEnabled: boolean;
+    extractOnly: boolean;
+    skipExistingFileCheck: boolean;
+    filesAlreadyExtracted: boolean;
+    forceHocrToPlaintext: boolean;
     externalEnabled: boolean;
     dnsCacheEnabled: boolean;
     accessTtl: number;
@@ -60,6 +65,27 @@ export interface Config {
         host: string;
         port: number;
     };
+    solr: null | {
+        host: string;
+        port: number;
+        delay: number;
+    };
+    mysql: {
+        host: string;
+        port: number;
+        user: string;
+        pass: string;
+        db: string;
+    };
+    brpFullAdsDirectory?: string;
+    brpAdsIndexFile?: string;
+    brpAdsIndexBrokenDateFile?:string;
+    brpAisIndexFile?: string;
+    brpOcr?: string;
+    brpSolrUpdate: boolean;
+    brpTitleLookup?: string;
+    brpOverrideManifests: boolean;
+    brpUpdateProcessOngoing: boolean;
 }
 
 const config: Config = {
@@ -76,10 +102,25 @@ const config: Config = {
     elasticSearchUser: process.env.IIIF_SERVER_ELASTICSEARCH_USER,
     elasticSearchPassword: process.env.IIIF_SERVER_ELASTICSEARCH_PASSWORD,
     ipAddressHeader: process.env.IIIF_SERVER_IP_ADDRESS_HEADER,
+    brpFullAdsDirectory: process.env.BRP_FULL_ADS_DIRECTORY,
+    brpAdsIndexFile: process.env.BRP_ADS_INDEX_FILE,
+    brpAisIndexFile: process.env.BRP_AIS_INDEX_FILE,
+    brpAdsIndexBrokenDateFile: process.env.BRP_ADS_INDEX_BROKEN_DATE_FILE,
+    brpOcr: process.env.BRP_OCR,
+    brpTitleLookup: process.env.BRP_TITLE_LOOKUP_FILE,
 
     loginEnabled: isEnabled(process.env.IIIF_SERVER_LOGIN_ENABLED),
     externalEnabled: isEnabled(process.env.IIIF_SERVER_EXTERNAL_ENABLED),
     dnsCacheEnabled: isEnabled(process.env.IIIF_SERVER_DNS_CACHE_ENABLED),
+    // if set to true only images and hocr are extracted, but no indexing to solr and manifest is performed
+    extractOnly: isEnabled(process.env.IIIF_SERVER_EXTRACT_ONLY),
+    skipExistingFileCheck: isEnabled(process.env.IIIF_SERVER_SKIP_EXISTING_FILE_CHECK),
+    filesAlreadyExtracted: isEnabled(process.env.IIIF_SERVER_FILES_ALREADY_EXTRACTED),
+    forceHocrToPlaintext: isEnabled(process.env.IIIF_SERVER_FORCE_HOCR_TO_PLAINTEXT),
+    brpSolrUpdate: isEnabled(process.env.BRP_SOLR_UPDATE),
+    // if set to true mock transkribus (with ADS id) brps are being parsed by the dir watcher and manifests & solr indexing is performed
+    brpUpdateProcessOngoing: isEnabled(process.env.BRP_UPDATE_PROCESS_ONGOING),
+    brpOverrideManifests: isEnabled(process.env.BRP_OVERRIDE_MANIFESTS),
 
     imageServerUrl: (_ => {
         if (!process.env.IIIF_SERVER_IMAGE_SERVER_URL || (process.env.IIIF_SERVER_IMAGE_SERVER_URL === 'null'))
@@ -92,6 +133,30 @@ const config: Config = {
             !['loris', 'sharp'].includes(process.env.IIIF_SERVER_IMAGE_SERVER_NAME))
             throw new Error('Image server name should either be \'loris\' or \'sharp\'');
         return process.env.IIIF_SERVER_IMAGE_SERVER_NAME as 'loris' | 'sharp';
+    })(),
+    
+    audioVideoServerUrl: (_ => {
+        if (!process.env.IIIF_SERVER_AUDIOVIDEO_SERVER_URL || (process.env.IIIF_SERVER_AUDIOVIDEO_SERVER_URL === 'null'))
+            throw new Error('Audio/Video server url is not defined');
+        return process.env.IIIF_SERVER_AUDIOVIDEO_SERVER_URL;
+    })(),
+    
+    manifestServerUrl: (_ => {
+        if (!process.env.IIIF_SERVER_MANIFEST_SERVER_URL || (process.env.IIIF_SERVER_MANIFEST_SERVER_URL === 'null'))
+            throw new Error('Manifest server url is not defined');
+        return process.env.IIIF_SERVER_MANIFEST_SERVER_URL;
+    })(),
+    
+    manifestSearchUrl: (_ => {
+        if (!process.env.IIIF_SERVER_MANIFEST_SEARCH_URL || (process.env.IIIF_SERVER_MANIFEST_SEARCH_URL === 'null'))
+            throw new Error('Manifest search url is not defined');
+        return process.env.IIIF_SERVER_MANIFEST_SEARCH_URL;
+    })(),
+
+    iconsServerUrl: (_ => {
+        if (!process.env.IIIF_SERVER_ICONS_SERVER_URL || (process.env.IIIF_SERVER_ICONS_SERVER_URL === 'null'))
+            throw new Error('Icons server url is not defined');
+        return process.env.IIIF_SERVER_ICONS_SERVER_URL;
     })(),
 
     logoDimensions: (_ => {
@@ -170,6 +235,18 @@ const config: Config = {
         const maxSearchResults = process.env.IIIF_SERVER_MAX_SEARCH_RESULTS
             ? parseInt(process.env.IIIF_SERVER_MAX_SEARCH_RESULTS) : 0;
         return (maxSearchResults > 0) ? maxSearchResults : 5000;
+    })(),
+
+    waitingMinutesBeforeIndexing: (() => {
+        const waitingTime = process.env.IIIF_SERVER_WAITING_MINUTES_BEFORE_INDEXING
+            ? parseInt(process.env.IIIF_SERVER_WAITING_MINUTES_BEFORE_INDEXING) : 0;
+        return (waitingTime >= 0) ? waitingTime : 1;
+    })(),
+
+    indexingInterval: (() => {
+        const interval = process.env.IIIF_SERVER_INDEXING_INTERVAL_MS
+            ? parseInt(process.env.IIIF_SERVER_INDEXING_INTERVAL_MS) : 0;
+        return (interval >= 0) ? interval : 30000;
     })(),
 
     services: (_ => {
@@ -275,6 +352,32 @@ const config: Config = {
             ? parseInt(process.env.IIIF_SERVER_REDIS_PERSIST_PORT) : 6379;
 
         return {host, port};
+    })(),
+
+    solr: (() => {
+        const host = (process.env.IIIF_SERVER_SOLR_HOST && (process.env.IIIF_SERVER_SOLR_HOST !== 'null'))
+            ? process.env.IIIF_SERVER_SOLR_HOST : 'localhost';
+        const port = process.env.IIIF_SERVER_SOLR_PORT && parseInt(process.env.IIIF_SERVER_SOLR_PORT) > 0
+            ? parseInt(process.env.IIIF_SERVER_SOLR_PORT) : 8983;
+        const delay = process.env.IIIF_SERVER_SOLR_DELAY && parseInt(process.env.IIIF_SERVER_SOLR_DELAY) > 0
+            ? parseInt(process.env.IIIF_SERVER_SOLR_DELAY) : 100;
+
+        return {host, port, delay};
+    })(),
+    
+    mysql: (() => {
+        const host = (process.env.IIIF_SERVER_MYSQL_HOST && (process.env.IIIF_SERVER_MYSQL_HOST !== 'null'))
+            ? process.env.IIIF_SERVER_MYSQL_HOST : 'localhost';
+        const user = (process.env.IIIF_SERVER_MYSQL_USER && (process.env.IIIF_SERVER_MYSQL_USER !== 'null'))
+            ? process.env.IIIF_SERVER_MYSQL_USER : 'db';
+        const pass = (process.env.IIIF_SERVER_MYSQL_PASS && (process.env.IIIF_SERVER_MYSQL_PASS !== 'null'))
+            ? process.env.IIIF_SERVER_MYSQL_PASS : 'db';
+        const db = (process.env.IIIF_SERVER_MYSQL_DB && (process.env.IIIF_SERVER_MYSQL_DB !== 'null'))
+            ? process.env.IIIF_SERVER_MYSQL_DB : 'olr';
+        const port = process.env.IIIF_SERVER_MYSQL_PORT && parseInt(process.env.IIIF_SERVER_MYSQL_PORT) > 0
+            ? parseInt(process.env.IIIF_SERVER_MYSQL_PORT) : 3306;
+
+        return {host, port, user, pass, db};
     })()
 };
 

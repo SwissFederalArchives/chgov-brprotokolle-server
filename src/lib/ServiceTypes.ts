@@ -1,6 +1,7 @@
 import {Item, RootItem} from './ItemInterfaces.js';
 import {AuthTexts} from '@archival-iiif/presentation-builder/v2';
 import {ManifestBehavior, CanvasBehavior} from '@archival-iiif/presentation-builder/v3';
+import {CollectionMetadata} from "../service/neat_metadata";
 
 export type EmptyParams = {};
 export type ItemParams = { item: Item };
@@ -9,9 +10,15 @@ export type CollectionIdParams = { collectionId: string };
 export type CollectionPathParams = { collectionPath: string };
 export type ProcessUpdateParams = { type: string, query: string };
 export type TextParams = { item: TextItem };
+export type ImageExtractParams = { collectionPath: string, metadata: CollectionMetadata };
+export type ManifestParams = { collectionPath: string, metadata: CollectionMetadata, fileStats: any[] };
+export type OcrIndexParams = { collectionPath: string, metadata: CollectionMetadata, docId: string, imageFilesPath: string};
 export type ReindexParams = { collectionIds?: string[], query?: string };
 export type AccessParams = { item: Item, ip?: string, identities?: string[] };
 export type MetadataParams = { metadataId?: string | null, rootId?: string, collectionId?: string };
+
+export const IMAGE_REGEX = '\.(pdf|jpe?g|tiff|png|jp2)$';
+export const AUDIO_REGEX = '\.(mp3|wav|ogg|m4a)$';
 
 export type TextItem = {
     id: string,

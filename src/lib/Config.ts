@@ -86,6 +86,8 @@ export interface Config {
     brpTitleLookup?: string;
     brpOverrideManifests: boolean;
     brpUpdateProcessOngoing: boolean;
+    brpOcrExtractionMode: string,
+    brpOcrAltoExtractionMaxParallelProcesses: number,
 }
 
 const config: Config = {
@@ -121,6 +123,18 @@ const config: Config = {
     // if set to true mock transkribus (with ADS id) brps are being parsed by the dir watcher and manifests & solr indexing is performed
     brpUpdateProcessOngoing: isEnabled(process.env.BRP_UPDATE_PROCESS_ONGOING),
     brpOverrideManifests: isEnabled(process.env.BRP_OVERRIDE_MANIFESTS),
+
+    brpOcrExtractionMode: (_ => {
+        if (!process.env.BRP_OCR_EXTRACTION_MODE || (process.env.BRP_OCR_EXTRACTION_MODE === 'null'))
+            throw new Error('BRP ocr extraction mode is not defined');
+        return process.env.BRP_OCR_EXTRACTION_MODE;
+    })(),
+
+    brpOcrAltoExtractionMaxParallelProcesses: (_ => {
+        if (!process.env.BRP_OCR_ALTO_EXTRACTION_MAX_PARALLEL_PROCESSES || (process.env.BRP_OCR_ALTO_EXTRACTION_MAX_PARALLEL_PROCESSES === 'null'))
+            throw new Error('BRP ocr alto extraction max parallel processes is not defined');
+        return Number(process.env.BRP_OCR_ALTO_EXTRACTION_MAX_PARALLEL_PROCESSES);
+    })(),
 
     imageServerUrl: (_ => {
         if (!process.env.IIIF_SERVER_IMAGE_SERVER_URL || (process.env.IIIF_SERVER_IMAGE_SERVER_URL === 'null'))

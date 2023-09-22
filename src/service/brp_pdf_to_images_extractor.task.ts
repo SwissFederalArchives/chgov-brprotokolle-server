@@ -62,6 +62,8 @@ export default async function extractImages(indexParams: BrpBaseCollectionIndexP
         name: indexParams.name,
         absoluteRoot: indexParams.absoluteRoot,
         metadata: indexParams.metadata,
+        isTitlePageDocument: indexParams.isTitlePageDocument,
+        targetId: indexParams.targetId,
         transkribusId: 'Machine Written BRP - This should not be used if so this is an error',
         files: images
     } as BrpCollectionIndexParam;
@@ -70,7 +72,7 @@ export default async function extractImages(indexParams: BrpBaseCollectionIndexP
         // no further processing.
         return;
     }
-    runTask<BrpCollectionIndexParam>('brp-ocr-extract', nextParams);
+    return await runTask<BrpCollectionIndexParam>('brp-ocr-extract', nextParams);
 }
 
 async function doImageExtraction(indexParams: BrpBaseCollectionIndexParam, collectionName: string, imageContainerPath: string) {

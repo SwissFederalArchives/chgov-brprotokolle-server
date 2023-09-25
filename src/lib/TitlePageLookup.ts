@@ -1,8 +1,8 @@
 import {TitleLookupRecord} from "../service/brp/brp.types";
-import logger from "./Logger";
+import logger from "./Logger.js";
 import {readFileSync} from "fs";
 import parse from "csv-parse";
-import {AdsLookupMetadataTable} from "./AdsLookupMetadataTable";
+import {AdsLookupMetadataTable} from "./AdsLookupMetadataTable.js";
 
 export class TitlePageLookup {
 

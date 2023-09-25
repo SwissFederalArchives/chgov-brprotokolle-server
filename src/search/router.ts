@@ -1,8 +1,8 @@
 import {Context} from 'koa';
 import Router from '@koa/router';
 
-import logger from '../lib/Logger';
-import config from '../lib/Config';
+import logger from '../lib/Logger.js';
+import config from '../lib/Config.js';
 import axios from "axios";
 import * as _ from "lodash";
 import * as querystring from "querystring";

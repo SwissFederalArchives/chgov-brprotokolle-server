@@ -5,10 +5,10 @@ import {pathExistsSync} from 'fs-extra';
 import moment from 'moment';
 import * as chokidar from 'chokidar';
 
-import config from '../lib/Config';
-import logger from '../lib/Logger';
-import {runTask} from '../lib/Task';
-import {CollectionPathParams} from '../lib/ServiceTypes';
+import config from '../lib/Config.js';
+import logger from '../lib/Logger.js';
+import {runTask} from '../lib/Task.js';
+import {CollectionPathParams} from '../lib/ServiceTypes.js';
 
 const collectionsWatching: { [path: string]: Date | null } = {};
 

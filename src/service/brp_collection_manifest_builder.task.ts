@@ -4,19 +4,19 @@ import {
 
 import {parse, resolve} from 'path';
 
-import config from '../lib/Config';
-import logger from '../lib/Logger';
+import config from '../lib/Config.js';
+import logger from '../lib/Logger.js';
 
 import {promises as fsPromises, Dirent, statSync, existsSync, readFileSync, writeFile} from 'fs';
 import {ensureDir, writeJson} from "fs-extra";
 import * as _ from "lodash";
 import * as sizeOf from "image-size";
 import {promisify} from "util";
-import {asyncForEach} from "../lib/Utils";
+import {asyncForEach} from "../lib/Utils.js";
 import AsyncLock  from "async-lock";
 import Label4Lang = IIIFPresV3.Label4Lang;
-import {englishifyTitle, EXT_BASE_URL, EXT_LANG_ARR, EXT_LANG_MAP, LANGUAGE_IDENTIFIERS} from "./brp/i18n.utils";
-import {extractNavDate} from "./brp/brp.utils";
+import {englishifyTitle, EXT_BASE_URL, EXT_LANG_ARR, EXT_LANG_MAP, LANGUAGE_IDENTIFIERS} from "./brp/i18n.utils.js";
+import {extractNavDate} from "./brp/brp.utils.js";
 
 const COLLECTION_TEMPLATE = {
         '@context': 'http://iiif.io/api/presentation/3/context.json',

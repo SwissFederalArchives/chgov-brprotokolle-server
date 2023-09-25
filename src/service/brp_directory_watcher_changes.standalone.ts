@@ -3,19 +3,19 @@
  */
 
 
-import config from "../lib/Config";
+import config from "../lib/Config.js";
 import {existsSync, lstatSync} from 'fs';
 import {resolve, parse, relative, dirname} from 'path';
-import logger from "../lib/Logger";
+import logger from "../lib/Logger.js";
 import * as chokidar from 'chokidar';
 import {pathExistsSync, readdir} from "fs-extra";
 import moment from 'moment';
-import {AdsLookupMetadataTable} from "../lib/AdsLookupMetadataTable";
+import {AdsLookupMetadataTable} from "../lib/AdsLookupMetadataTable.js";
 import {BrpBaseCollectionIndexParam, BrpCollectionIndexParam, BrpExpandedCollectionIndexParam} from "./brp/brp.types";
-import {runTask} from "../lib/Task";
+import {runTask} from "../lib/Task.js";
 import * as path from "path";
-import {AisLookup} from "../lib/AisLookup";
-import {ADS_LOOKUP, AIS_LOOKUP, BRP_LOGGER, pageNoOf, TITLE_LOOKUP} from "./brp/brp.utils";
+import {AisLookup} from "../lib/AisLookup.js";
+import {ADS_LOOKUP, AIS_LOOKUP, BRP_LOGGER, pageNoOf, TITLE_LOOKUP} from "./brp/brp.utils.js";
 
 /**
  * Master directory for collection watching.

@@ -1,7 +1,7 @@
 import axios from "axios";
 import AgentKeepAlive from 'agentkeepalive';
 
-import logger from './Logger';
+import logger from './Logger.js';
 
 const keepAliveAgent = new AgentKeepAlive({
     maxSockets: 100, // Maximum number of sockets to allow per host. Defaults to Infinity.

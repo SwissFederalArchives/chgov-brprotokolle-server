@@ -1,15 +1,15 @@
 import {resolve} from "path";
-import config from "../../lib/Config";
+import config from "../../lib/Config.js";
 import {ensureDir} from "fs-extra";
 import {IIIFPresV3} from "./brp.types";
-import {EXT_BASE_URL, EXT_LANG_ARR, EXT_LANG_DESCRIPTION, LANGUAGE_IDENTIFIERS, OCR_LABELS} from "./i18n.utils";
+import {EXT_BASE_URL, EXT_LANG_ARR, EXT_LANG_DESCRIPTION, LANGUAGE_IDENTIFIERS, OCR_LABELS} from "./i18n.utils.js";
 import Rendering = IIIFPresV3.Rendering;
-import {AisLookup} from "../../lib/AisLookup";
-import {AdsLookupMetadataTable} from "../../lib/AdsLookupMetadataTable";
-import {TitlePageLookup} from "../../lib/TitlePageLookup";
+import {AisLookup} from "../../lib/AisLookup.js";
+import {AdsLookupMetadataTable} from "../../lib/AdsLookupMetadataTable.js";
+import {TitlePageLookup} from "../../lib/TitlePageLookup.js";
 import {isNaN} from "lodash";
 import {use} from "chai";
-import {BrpOdditiesLogger} from "../../lib/BrpOdditiesLogger";
+import {BrpOdditiesLogger} from "../../lib/BrpOdditiesLogger.js";
 
 const {romanToArab, arabToRoman, isValidArab, isValidRoman} = require('roman-numbers')
 

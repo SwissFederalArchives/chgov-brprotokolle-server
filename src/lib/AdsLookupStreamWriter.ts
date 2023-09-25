@@ -20,8 +20,6 @@ import {
     ADS_YEAR_ATTR,
     AdsMetadata
 } from "../service/brp/brp.types";
-import {head} from "lodash";
-import logger from "./Logger";
 
 export class AdsCsvStreamWriter {
 

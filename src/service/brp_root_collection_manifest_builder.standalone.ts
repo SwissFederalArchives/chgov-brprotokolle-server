@@ -4,16 +4,16 @@ import {
 
 import {resolve} from 'path';
 
-import config from '../lib/Config';
-import logger from '../lib/Logger';
+import config from '../lib/Config.js';
+import logger from '../lib/Logger.js';
 
 import {existsSync, promises as fsPromises} from 'fs';
 import {ensureDir} from "fs-extra";
 import * as _ from "lodash";
 import Label4Lang = IIIFPresV3.Label4Lang;
 import LabelNoLang = IIIFPresV3.LabelNoLang;
-import {asyncForEach, asyncForEachM} from "../lib/Utils";
-import {englishifyTitle, LANGUAGE_IDENTIFIERS} from "./brp/i18n.utils";
+import {asyncForEach, asyncForEachM} from "../lib/Utils.js";
+import {englishifyTitle, LANGUAGE_IDENTIFIERS} from "./brp/i18n.utils.js";
 import {
     extractNavDate,
     UriGenerator,
@@ -23,7 +23,7 @@ import {
     yearOf,
     AIS_LOOKUP,
     ADS_LOOKUP
-} from "./brp/brp.utils";
+} from "./brp/brp.utils.js";
 
 /**
  * A standalone component to build the root / yearly / monthly collection manifests

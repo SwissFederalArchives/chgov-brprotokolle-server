@@ -2,13 +2,13 @@
  * Task to extract hOCR courtesy of tesseract (requires tesseract to be installed).
  */
 import {BrpCollectionIndexParam, BrpCollectionPage, BrpExpandedCollectionIndexParam} from "./brp/brp.types";
-import logger from "../lib/Logger";
+import logger from "../lib/Logger.js";
 import {resolve, parse} from 'path';
-import config from "../lib/Config";
+import config from "../lib/Config.js";
 import {copy, ensureDir, readdir, unlink, writeFile} from "fs-extra";
 import {spawn} from "child_process";
-import {runTask} from "../lib/Task";
-import {asyncForEach} from "../lib/Utils";
+import {runTask} from "../lib/Task.js";
+import {asyncForEach} from "../lib/Utils.js";
 
 const pageNoSorter = (a: string, b: string): number => {
     return Number(extractPageNumber(a)) - Number(extractPageNumber(b));

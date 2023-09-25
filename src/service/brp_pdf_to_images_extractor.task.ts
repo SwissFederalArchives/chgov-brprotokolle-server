@@ -1,13 +1,13 @@
 import {resolve} from 'path';
 
-import config from '../lib/Config';
-import logger from '../lib/Logger';
-import {runTask} from '../lib/Task';
+import config from '../lib/Config.js';
+import logger from '../lib/Logger.js';
+import {runTask} from '../lib/Task.js';
 import {ensureDir} from "fs-extra";
 import {spawn} from "child_process";
 import {existsSync, rename, promises as fsPromises} from 'fs';
 import {BrpBaseCollectionIndexParam, BrpCollectionIndexParam} from "./brp/brp.types";
-import {AIS_LOOKUP, pageNoOf, pageNumber, PathUtils, toTitlePageNo} from "./brp/brp.utils";
+import {AIS_LOOKUP, pageNoOf, pageNumber, PathUtils, toTitlePageNo} from "./brp/brp.utils.js";
 import * as fs from "fs";
 
 const {readdir, stat} = fsPromises;

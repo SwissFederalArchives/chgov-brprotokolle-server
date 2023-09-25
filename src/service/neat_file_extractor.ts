@@ -1,14 +1,14 @@
 import {parse, resolve} from 'path';
 
-import config from '../lib/Config';
-import logger from '../lib/Logger';
-import {runTask} from '../lib/Task';
+import config from '../lib/Config.js';
+import logger from '../lib/Logger.js';
+import {runTask} from '../lib/Task.js';
 
-import {AUDIO_REGEX, IMAGE_REGEX, ImageExtractParams, ManifestParams, OcrIndexParams} from "../lib/ServiceTypes";
+import {AUDIO_REGEX, IMAGE_REGEX, ImageExtractParams, ManifestParams, OcrIndexParams} from "../lib/ServiceTypes.js";
 import {ensureDir} from "fs-extra";
 import {spawn} from "child_process";
 import { promises as fsPromises } from 'fs';
-import {CollectionMetadata} from "./neat_metadata";
+import {CollectionMetadata} from "./neat_metadata.js";
 
 const { readdir, stat } = fsPromises;
 

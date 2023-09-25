@@ -1,5 +1,5 @@
-import config from '../lib/Config';
-import logger from '../lib/Logger';
+import config from '../lib/Config.js';
+import logger from '../lib/Logger.js';
 import {existsSync, readFileSync, lstatSync} from "fs";
 import {readdir} from "fs-extra";
 import {resolve} from "path";
@@ -30,10 +30,10 @@ import {
     AdsMetadata
 } from "./brp/brp.types";
 import parse, {XmlDocument, XmlNode} from "fsp-xml-parser";
-import {AdsCsvStreamWriter} from "../lib/AdsLookupStreamWriter";
-import {CsvStreamWriter} from "../lib/CsvStreamWriter";
-import {applyFix, MANUAL_FIX_ADS_ID} from "./brp/index-fixes.utils";
-import {AIS_LOOKUP} from "./brp/brp.utils";
+import {AdsCsvStreamWriter} from "../lib/AdsLookupStreamWriter.js";
+import {CsvStreamWriter} from "../lib/CsvStreamWriter.js";
+import {applyFix, MANUAL_FIX_ADS_ID} from "./brp/index-fixes.utils.js";
+import {AIS_LOOKUP} from "./brp/brp.utils.js";
 
 let brokenFileWriter: CsvStreamWriter;
 

@@ -1,7 +1,7 @@
 import {readFileSync} from "fs";
-import {AdsCsvStreamWriter} from "./AdsLookupStreamWriter";
+import {AdsCsvStreamWriter} from "./AdsLookupStreamWriter.js";
 import parse from "csv-parse";
-import logger from "./Logger";
+import logger from "./Logger.js";
 import {AdsMetadata} from "../service/brp/brp.types";
 
 /**

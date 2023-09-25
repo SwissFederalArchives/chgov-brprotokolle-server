@@ -1,14 +1,14 @@
 import {resolve, parse} from 'path';
 
-import config from '../lib/Config';
-import logger from '../lib/Logger';
+import config from '../lib/Config.js';
+import logger from '../lib/Logger.js';
 
-import {OcrIndexParams} from "../lib/ServiceTypes";
+import {OcrIndexParams} from "../lib/ServiceTypes.js";
 import {ensureDir} from "fs-extra";
 import { promises as fsPromises, Dirent} from 'fs';
 import {spawn} from "child_process";
 import axios from "axios";
-import {CollectionMetadata} from "./neat_metadata";
+import {CollectionMetadata} from "./neat_metadata.js";
 
 const { readdir, writeFile, unlink } = fsPromises;
 

@@ -1,11 +1,11 @@
 import {promisify} from 'util';
 import {parse} from 'path';
 
-import config from '../lib/Config';
-import logger from '../lib/Logger';
-import {runTask} from '../lib/Task';
+import config from '../lib/Config.js';
+import logger from '../lib/Logger.js';
+import {runTask} from '../lib/Task.js';
 
-import {ImageExtractParams, CollectionPathParams} from "../lib/ServiceTypes";
+import {ImageExtractParams, CollectionPathParams} from "../lib/ServiceTypes.js";
 import * as mysql from "mysql";
 
 export type CollectionMetadata = {

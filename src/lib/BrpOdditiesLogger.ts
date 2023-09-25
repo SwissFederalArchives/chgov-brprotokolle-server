@@ -1,8 +1,8 @@
 import {resolve} from "path";
 import {removeSync} from "fs-extra";
 import {writeFileSync} from "fs";
-import logger from "./Logger";
-import config from "./Config";
+import logger from "./Logger.js";
+import config from "./Config.js";
 
 export class BrpOdditiesLogger {
 

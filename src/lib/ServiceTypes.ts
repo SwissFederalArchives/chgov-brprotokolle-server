@@ -1,7 +1,7 @@
 import {Item, RootItem} from './ItemInterfaces.js';
 import {AuthTexts} from '@archival-iiif/presentation-builder/v2';
 import {ManifestBehavior, CanvasBehavior} from '@archival-iiif/presentation-builder/v3';
-import {CollectionMetadata} from "../service/neat_metadata";
+import {CollectionMetadata} from "../service/neat_metadata.js";
 
 export type EmptyParams = {};
 export type ItemParams = { item: Item };

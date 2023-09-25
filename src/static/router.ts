@@ -6,7 +6,7 @@ import HttpError from '../lib/HttpError.js';
 import {ExtendedContext} from '../lib/Koa.js';
 import {fileIconsPath} from '../lib/FileIcon.js';
 
-import logger from '../lib/Logger';
+import logger from '../lib/Logger.js';
 
 export const router = new Router<DefaultState, ExtendedContext>();
 

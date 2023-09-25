@@ -1,9 +1,9 @@
 import {parse, resolve} from 'path';
 
-import config from '../lib/Config';
-import logger from '../lib/Logger';
+import config from '../lib/Config.js';
+import logger from '../lib/Logger.js';
 
-import {AUDIO_REGEX, IMAGE_REGEX, ManifestParams} from "../lib/ServiceTypes";
+import {AUDIO_REGEX, IMAGE_REGEX, ManifestParams} from "../lib/ServiceTypes.js";
 import {promises as fsPromises, Dirent} from 'fs';
 import {ensureDir} from "fs-extra";
 import * as _ from "lodash";

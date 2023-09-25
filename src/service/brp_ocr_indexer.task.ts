@@ -5,17 +5,17 @@ import {
 
 import {resolve, parse} from 'path';
 
-import config from '../lib/Config';
-import logger from '../lib/Logger';
+import config from '../lib/Config.js';
+import logger from '../lib/Logger.js';
 
-import {OcrIndexParams} from "../lib/ServiceTypes";
+import {OcrIndexParams} from "../lib/ServiceTypes.js";
 import {ensureDir} from "fs-extra";
 import { promises as fsPromises, Dirent} from 'fs';
 import {spawn, spawnSync} from "child_process";
 
-import { axiosInstance } from '../lib/AxiosKeepAliveAgent';
+import { axiosInstance } from '../lib/AxiosKeepAliveAgent.js';
 
-import {ALTO_OCR_TYPE, HOCR_OCR_TYPE, PAGE_OCR_TYPE} from "./brp/brp.utils";
+import {ALTO_OCR_TYPE, HOCR_OCR_TYPE, PAGE_OCR_TYPE} from "./brp/brp.utils.js";
 import {promisify} from "util";
 
 const sleep = promisify(setTimeout);

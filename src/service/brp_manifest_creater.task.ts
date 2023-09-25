@@ -8,15 +8,15 @@ import {
 
 import {resolve} from 'path';
 
-import config from '../lib/Config';
-import logger from '../lib/Logger';
+import config from '../lib/Config.js';
+import logger from '../lib/Logger.js';
 
 import {promises as fsPromises} from 'fs';
 import {ensureDir} from "fs-extra";
 import * as sizeOf from "image-size";
 import {promisify} from "util";
-import {asyncForEach} from "../lib/Utils";
-import {runTask} from "../lib/Task";
+import {asyncForEach} from "../lib/Utils.js";
+import {runTask} from "../lib/Task.js";
 import {
     DATE_LABEL_DE, DATE_LABEL_EN, DATE_LABEL_FR, DATE_LABEL_IT,
     englishifyTitle,
@@ -33,7 +33,7 @@ import {
     TITLE_LABEL_EN,
     TITLE_LABEL_FR,
     TITLE_LABEL_IT
-} from "./brp/i18n.utils";
+} from "./brp/i18n.utils.js";
 import {
     extractNavDate,
     getOcrMime,
@@ -45,7 +45,7 @@ import {
     pageNumberCompare,
     UriGenerator,
     yearOf
-} from "./brp/brp.utils";
+} from "./brp/brp.utils.js";
 import Annotation = IIIFPresV3.Annotation;
 import AnnotationBody = IIIFPresV3.AnnotationBody;
 import Canvas = IIIFPresV3.Canvas;

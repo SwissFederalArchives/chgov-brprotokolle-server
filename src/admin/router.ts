@@ -9,7 +9,7 @@ import {ExtendedContext} from '../lib/Koa.js';
 import {getIpAddress} from '../lib/Security.js';
 import {EmptyParams, CollectionPathParams, MetadataParams, ProcessUpdateParams, ReindexParams} from '../lib/ServiceTypes.js';
 
-import config from "../lib/Config";
+import config from "../lib/Config.js";
 
 export const router = new Router<DefaultState, ExtendedContext>({prefix: '/admin'});
 

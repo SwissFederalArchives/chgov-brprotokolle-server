@@ -3,15 +3,15 @@
  */
 
 import {BrpCollectionIndexParam, BrpCollectionPage, BrpExpandedCollectionIndexParam} from "./brp/brp.types";
-import logger from '../lib/Logger';
-import {runTask} from '../lib/Task';
+import logger from '../lib/Logger.js';
+import {runTask} from '../lib/Task.js';
 import {resolve} from "path";
 
 import {copy, readdir} from 'fs-extra';
 import {existsSync} from "fs";
 import {spawn} from "child_process";
-import {pageNoComp, pageNoOf, pageNoOfUrl, pageNumber, PathUtils, toTitlePageNo} from "./brp/brp.utils";
-import config from "../lib/Config";
+import {pageNoComp, pageNoOf, pageNoOfUrl, pageNumber, PathUtils, toTitlePageNo} from "./brp/brp.utils.js";
+import config from "../lib/Config.js";
 
 export default async function buildCollection(param: BrpCollectionIndexParam){
     logger.info(`Running service builder for collection ${param.name}`);

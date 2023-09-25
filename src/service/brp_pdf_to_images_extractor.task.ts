@@ -3,7 +3,6 @@ import {resolve} from 'path';
 import config from '../lib/Config.js';
 import logger from '../lib/Logger.js';
 import {runTask} from '../lib/Task.js';
-import {ensureDir} from "fs-extra";
 import {spawn} from "child_process";
 import {existsSync, rename, promises as fsPromises} from 'fs';
 import {BrpBaseCollectionIndexParam, BrpCollectionIndexParam} from "./brp/brp.types";
@@ -12,7 +11,6 @@ import * as fs from "fs";
 
 const {readdir, stat} = fsPromises;
 
-const _ = require('lodash');
 
 export default async function extractImages(indexParams: BrpBaseCollectionIndexParam) {
     logger.info(`Starting task pdf-to-images for collection ${indexParams.absoluteRoot}`);

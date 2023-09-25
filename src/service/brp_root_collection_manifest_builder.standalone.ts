@@ -8,7 +8,7 @@ import config from '../lib/Config.js';
 import logger from '../lib/Logger.js';
 
 import {existsSync, promises as fsPromises} from 'fs';
-import {ensureDir} from "fs-extra";
+import fsExtra from "fs-extra";
 import * as _ from "lodash";
 import Label4Lang = IIIFPresV3.Label4Lang;
 import LabelNoLang = IIIFPresV3.LabelNoLang;
@@ -123,7 +123,7 @@ async function mockRootCollection(){
 
     const manifestContainerPath = resolve(config.dataRootPath, config.collectionsRelativePath, 'manifests');
 
-    await ensureDir(manifestContainerPath);
+    await fsExtra.ensureDir(manifestContainerPath);
 
     const rootManifest = resolve(manifestContainerPath, 'mock', 'year-collections.json');
 
@@ -136,7 +136,7 @@ async function mockRootCollection(){
 
     for (let year = 1848; year <= 1963; year++) {
         const yearlyContainerPath = resolve(manifestContainerPath, 'mock', '' + year);
-        await ensureDir(yearlyContainerPath);
+        await fsExtra.ensureDir(yearlyContainerPath);
         const yearCollectionM = createYearCollection(year);
         const yearCollectionPath = resolve(yearlyContainerPath, 'manifest.json');
         for (let month = 0; month < 12; month++) {

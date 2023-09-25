@@ -19,7 +19,7 @@ import {
     ADS_VOL_PAGES_ATTR,
     ADS_YEAR_ATTR,
     AdsMetadata
-} from "../service/brp/brp.types";
+} from "../service/brp/brp.types.js";
 
 export class AdsCsvStreamWriter {
 

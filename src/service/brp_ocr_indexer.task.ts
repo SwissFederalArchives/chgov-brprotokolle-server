@@ -9,7 +9,6 @@ import config from '../lib/Config.js';
 import logger from '../lib/Logger.js';
 
 import {OcrIndexParams} from "../lib/ServiceTypes.js";
-import {ensureDir} from "fs-extra";
 import { promises as fsPromises, Dirent} from 'fs';
 import {spawn, spawnSync} from "child_process";
 

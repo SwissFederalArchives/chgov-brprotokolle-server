@@ -7,7 +7,7 @@ import logger from '../lib/Logger.js';
 import {runTask} from '../lib/Task.js';
 import {resolve} from "path";
 
-import {copy, readdir} from 'fs-extra';
+import fsExtra from 'fs-extra';
 import {existsSync} from "fs";
 import {spawn} from "child_process";
 import {pageNoComp, pageNoOf, pageNoOfUrl, pageNumber, PathUtils, toTitlePageNo} from "./brp/brp.utils.js";
@@ -46,14 +46,14 @@ export default async function buildCollection(param: BrpCollectionIndexParam){
             const targetName = `${collectionName}-${pageNo}`;
             const targetPath = resolve(imagesContainerPath, targetName + '.' + suffix);
             // Copy Image File
-            await copy(file, targetPath);
+            await fsExtra.copy(file, targetPath);
             // check for ocr files, if existent copy them too
             const altoOcrFile = resolve(param.absoluteRoot, 'alto', imgName + '.xml');
             const hocrOcrFile = resolve(param.absoluteRoot, 'hocr', imgName + '.hocr');
 
             const altoDest = resolve(altoOcrContainerPath, targetName + '.xml');
             if (!(config.filesAlreadyExtracted && config.skipExistingFileCheck) && !existsSync(altoDest) && existsSync(altoOcrFile)) {
-                await copy(altoOcrFile, altoDest);
+                await fsExtra.copy(altoOcrFile, altoDest);
             }
 
             const hocrDest = resolve(hocrOcrContainerPath, targetName + '.hocr');
@@ -62,7 +62,7 @@ export default async function buildCollection(param: BrpCollectionIndexParam){
                 logger.info(`HOCR file ${hocrDest} already exists, skipping`);
             } else {
                 if (existsSync(hocrOcrFile)) {
-                    await copy(hocrOcrFile, hocrDest);
+                    await fsExtra.copy(hocrOcrFile, hocrDest);
                     logger.info('Copy of ' + imgName + ' complete.');
                 } else {
                     /* hcor doesn't exist, lets create it */
@@ -99,7 +99,7 @@ export default async function buildCollection(param: BrpCollectionIndexParam){
         // we just stop here, all we had to do for a titlepage was copy the right stuff
         return;
     }
-    const images = await readdir(imagesContainerPath);
+    const images = await fsExtra.readdir(imagesContainerPath);
     for(const image of images){
         const imgName = image.substring(image.lastIndexOf('/')+1, image.lastIndexOf('.'));
         //const suffix = image.substring(image.lastIndexOf('.')+1); // Image suffix

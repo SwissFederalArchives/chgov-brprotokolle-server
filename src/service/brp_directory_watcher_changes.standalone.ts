@@ -8,7 +8,7 @@ import {existsSync, lstatSync} from 'fs';
 import {resolve, parse, relative, dirname} from 'path';
 import logger from "../lib/Logger.js";
 import * as chokidar from 'chokidar';
-import {pathExistsSync, readdir} from "fs-extra";
+import fsExtra from "fs-extra";
 import moment from 'moment';
 import {AdsLookupMetadataTable} from "../lib/AdsLookupMetadataTable.js";
 import {BrpBaseCollectionIndexParam, BrpCollectionIndexParam, BrpExpandedCollectionIndexParam} from "./brp/brp.types";
@@ -114,7 +114,7 @@ export default async function watchDirectoryForChanges() {
         } else {
             logger.info(``)
             // It's a folder, we'll move on with indexing each subfolder
-            const subfolders = await readdir(resolve(<string>config.hotFolderPath, path));
+            const subfolders = await fsExtra.readdir(resolve(<string>config.hotFolderPath, path));
             for (let i = 0; i < subfolders.length; i++) {
                 if (lstatSync(resolve(<string>config.hotFolderPath, path, subfolders[i])).isDirectory()) {
                     // subdir is a dir, let's see whether it fits the transkribus ids
@@ -201,7 +201,7 @@ async function startIndexForNewCollection(path: string) {
     // Reset "lastChanges"
     collectionsWatching[path] = null;
     // Be aware, either way, the actual data is two layers deeper than path
-    const subdirs = await readdir(resolve(config.hotFolderPath!, path));
+    const subdirs = await fsExtra.readdir(resolve(config.hotFolderPath!, path));
     if (subdirs.length < 1) {
         logger.error(`Ignoring ${path} as it has no subfolder (which is expected)`);
         delete collectionsWatching[path];
@@ -223,7 +223,7 @@ async function startIndexForNewCollection(path: string) {
     logger.debug('BRP Issue found at ' + issueRoot);
     const issueRootRelative = resolve('.', path, issueName);
     // BE AWARE: Here, we are in an issue ("Band"), however, we will have ONE collection PER minutes ("Protokoll")
-    const entries = await readdir(issueRoot);
+    const entries = await fsExtra.readdir(issueRoot);
     const adsId2IndexParamMap = new Map<string, BrpCollectionIndexParam>();
     logger.debug('Found ' + entries.length + ' entries in issue ' + issueRoot);
     logger.debug('Lookup ready: ' + ADS_LOOKUP.isReady());
@@ -291,7 +291,7 @@ async function startIndexForNewCollection(path: string) {
         logger.info('Starting to build collection for ' + adsId);
         const ocrContainerPath = resolve(config.dataRootPath, config.collectionsRelativePath, 'ocr', param.name)
         const manifestContainerPath = resolve(config.dataRootPath, config.collectionsRelativePath, 'manifests', param.name)
-        if (pathExistsSync(manifestContainerPath) && pathExistsSync(ocrContainerPath)) {
+        if (fsExtra.pathExistsSync(manifestContainerPath) && fsExtra.pathExistsSync(ocrContainerPath)) {
             logger.warn(`Collection ${adsId} already indexed. Delete indexed data and re-add to re-start indexing process.`)
         } else {
             await runTask<BrpCollectionIndexParam>('brp-builder', param);
@@ -328,7 +328,7 @@ async function startIndexForMbrp(path: string) {
         /* Do sanity check before override */
         const ocrContainerPath = resolve(config.dataRootPath, config.collectionsRelativePath, 'ocr', param.name)
         const manifestContainerPath = resolve(config.dataRootPath, config.collectionsRelativePath, 'manifests', param.name)
-        if (pathExistsSync(manifestContainerPath) && pathExistsSync(ocrContainerPath)) {
+        if (fsExtra.pathExistsSync(manifestContainerPath) && fsExtra.pathExistsSync(ocrContainerPath)) {
             logger.warn(`Collection ${param.name} already indexed. Delete indexed data and re-add to re-start indexing process.`)
         } else {
             await runTask<BrpBaseCollectionIndexParam>('brp-image-extract', param);
@@ -354,7 +354,7 @@ async function startIndexForUpdate(path: string){
         transkribusId: "UPDATING",
         files: []
     } as BrpCollectionIndexParam;
-    const mockFiles = await readdir(params.absoluteRoot);
+    const mockFiles = await fsExtra.readdir(params.absoluteRoot);
     mockFiles.filter(f => f.endsWith('.jpg'))
         .forEach(f => params.files.push(f));
     logger.info(`Created UPDATE ${JSON.stringify(params)}`)
@@ -402,7 +402,7 @@ async function buildMbrpParametersForYear(fullPathYear: string): Promise<Array<B
         logger.debug(`Building index params for year ${pathYear} @ ${fullPathYear}`);
         if(validateMBRPYear(pathYear)){ // Sanity check
             const list: Array<BrpBaseCollectionIndexParam> = [];
-            const entries = await readdir(fullPathYear);
+            const entries = await fsExtra.readdir(fullPathYear);
             for(let i=0; i<entries.length; i++){
                 const entry = entries[i];
                 if(validateMBRPAdsId(entry)){ // Looking at YOU .DS_Store

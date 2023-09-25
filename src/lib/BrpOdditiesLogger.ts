@@ -1,5 +1,5 @@
 import {resolve} from "path";
-import {removeSync} from "fs-extra";
+import fsExtra from "fs-extra";
 import {writeFileSync} from "fs";
 import logger from "./Logger.js";
 import config from "./Config.js";
@@ -37,7 +37,7 @@ export class BrpOdditiesLogger {
 
     private write(){
         const filename = resolve(config.dataRootPath!, this.filename());
-        removeSync(filename);
+        fsExtra.removeSync(filename);
         writeFileSync(filename, this.logs.join(`\n`))
     }
 

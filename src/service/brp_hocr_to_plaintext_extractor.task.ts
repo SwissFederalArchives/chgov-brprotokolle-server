@@ -1,6 +1,6 @@
 import {BrpExpandedCollectionIndexParam} from "./brp/brp.types";
 import logger from "../lib/Logger.js";
-import {readFile, writeFile} from "fs-extra";
+import fsExtra from "fs-extra";
 import {parse} from "node-html-parser"; // Apparently the fastest html parsers
 import {PathUtils} from "./brp/brp.utils.js";
 
@@ -18,7 +18,7 @@ export default async function extractPlainTextFromHOCR(param: BrpExpandedCollect
     const lines: string[] = [];
 
     for (let i = 0; i < param.collectionFiles.length; i++) {
-        const contents = await readFile(param.collectionFiles[i].hocrOcr!, 'utf-8');
+        const contents = await fsExtra.readFile(param.collectionFiles[i].hocrOcr!, 'utf-8');
         const root = parse(contents);
         const ocrLines = root.querySelectorAll('.ocr_line');
         let _line: string[] = [];
@@ -32,7 +32,7 @@ export default async function extractPlainTextFromHOCR(param: BrpExpandedCollect
         }
     }
 
-    await writeFile(await PathUtils.plainOcrTextFile(param.name), lines.join('\n'));
+    await fsExtra.writeFile(await PathUtils.plainOcrTextFile(param.name), lines.join('\n'));
 
     logger.info(`Finished Plaintext Extraction from OCR`);
 

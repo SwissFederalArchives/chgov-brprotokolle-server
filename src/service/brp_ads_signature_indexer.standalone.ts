@@ -1,7 +1,7 @@
 import config from '../lib/Config.js';
 import logger from '../lib/Logger.js';
 import {existsSync, readFileSync, lstatSync} from "fs";
-import {readdir} from "fs-extra";
+import fsExtra from "fs-extra";
 import {resolve} from "path";
 import {
     ADS_ADS_TAG,
@@ -86,7 +86,7 @@ export default async function buildIndexFromDirectory() {
         brokenFileWriter = new CsvStreamWriter(config.brpAdsIndexBrokenDateFile, ['id', 'year', 'pubdate', 'fixed', 'title'])
     }
     logger.info('Starting to build ADS index at ' + config.brpFullAdsDirectory);
-    const folders = await readdir(config.brpFullAdsDirectory);
+    const folders = await fsExtra.readdir(config.brpFullAdsDirectory);
     logger.info(`Found ${folders.length} entries`);
     logger.info(`Entries: ${JSON.stringify(folders)}`)
     for (let i = 0; i < folders.length; i++) {
@@ -100,7 +100,7 @@ export default async function buildIndexFromDirectory() {
         }
         // Check if it actually is a folder
         if (lstatSync(currentFolder).isDirectory()) {
-            const subfolders = await readdir(currentFolder);
+            const subfolders = await fsExtra.readdir(currentFolder);
             for (let j = 0; j < subfolders.length; j++) {
                 const subfolder = subfolders[j];
                 const xmlFile = resolveAdsMetadataFile(folder, subfolder);

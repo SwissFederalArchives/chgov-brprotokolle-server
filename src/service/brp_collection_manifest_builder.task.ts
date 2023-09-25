@@ -8,7 +8,7 @@ import config from '../lib/Config.js';
 import logger from '../lib/Logger.js';
 
 import {promises as fsPromises, Dirent, statSync, existsSync, readFileSync, writeFile} from 'fs';
-import {ensureDir, writeJson} from "fs-extra";
+import fsExtra from "fs-extra";
 import * as _ from "lodash";
 import * as sizeOf from "image-size";
 import {promisify} from "util";
@@ -78,7 +78,7 @@ export default async function createRootManifest(param: BrpRootCollectionIndexPa
 
     const manifestContainerPath = resolve(config.dataRootPath, config.collectionsRelativePath, 'manifests');
 
-    await ensureDir(manifestContainerPath);
+    await fsExtra.ensureDir(manifestContainerPath);
 
     const rootManifest = resolve(manifestContainerPath, 'manifest.json');
     const rootManifestLock = resolve(manifestContainerPath, 'manifest.lock');

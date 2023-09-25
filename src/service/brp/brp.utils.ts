@@ -7,11 +7,14 @@ import Rendering = IIIFPresV3.Rendering;
 import {AisLookup} from "../../lib/AisLookup.js";
 import {AdsLookupMetadataTable} from "../../lib/AdsLookupMetadataTable.js";
 import {TitlePageLookup} from "../../lib/TitlePageLookup.js";
-import {isNaN} from "lodash";
+import lodash from "lodash";
 import {use} from "chai";
 import {BrpOdditiesLogger} from "../../lib/BrpOdditiesLogger.js";
 
-const {romanToArab, arabToRoman, isValidArab, isValidRoman} = require('roman-numbers')
+//import {romanToArab, arabToRoman, isValidArab, isValidRoman} from "roman-numbers";
+import romanNumbers from "roman-numbers";
+//const {romanToArab, arabToRoman, isValidArab, isValidRoman} = require('roman-numbers')
+
 
 export namespace IIIFUtils {
     import Label4Lang = IIIFPresV3.Label4Lang;
@@ -355,11 +358,11 @@ export function pageNumber(imageUrl: string){
 }
 
 export function toTitlePageNo(pageNumber: number){
-    return arabToRoman(pageNumber).toLowerCase();
+    return romanNumbers.arabToRoman(pageNumber).toLowerCase();
 }
 
 export function titlePageNumber(titlePageNo: string){
-    return romanToArab(titlePageNo);
+    return romanNumbers.romanToArab(titlePageNo);
 }
 
 export function pageNoComp(aFile: string, bFile:string, safe=false): number{
@@ -373,14 +376,14 @@ export function pageNumberCompare(aLabel: string, bLabel: string): number {
     // isNaN == isString and !isNaN == isNumeric
     if(isRomanNumber(aLabel) && isRomanNumber(bLabel)){
         // Both title pages, sort according to number
-        return romanToArab(aLabel) - romanToArab(bLabel);
-    }else if(isRomanNumber(aLabel) && !isNaN(bLabel)){
+        return romanNumbers.romanToArab(aLabel) - romanNumbers.romanToArab(bLabel);
+    }else if(isRomanNumber(aLabel) && !lodash.isNaN(bLabel)){
         // A is a title page, sort it before
         return -1;
-    }else if(!isNaN(aLabel) && isRomanNumber(bLabel)){
+    }else if(!lodash.isNaN(aLabel) && isRomanNumber(bLabel)){
         // B is a title page, sort it before
         return 1;
-    }else if(!isNaN(aLabel) && !isNaN(bLabel)){
+    }else if(!lodash.isNaN(aLabel) && !lodash.isNaN(bLabel)){
         // both normal pages
         return Number(aLabel) - Number(bLabel);
     }else{

@@ -4,7 +4,7 @@ import {
     BrpExpandedCollectionIndexParam,
     BrpRootCollectionIndexParam,
     IIIFPresV3
-} from "./brp/brp.types";
+} from "./brp/brp.types.js";
 
 import {resolve} from 'path';
 
@@ -12,7 +12,7 @@ import config from '../lib/Config.js';
 import logger from '../lib/Logger.js';
 
 import {promises as fsPromises} from 'fs';
-import {ensureDir} from "fs-extra";
+import fsExtra from "fs-extra";
 import * as sizeOf from "image-size";
 import {promisify} from "util";
 import {asyncForEach} from "../lib/Utils.js";
@@ -93,7 +93,7 @@ async function createManifestV3(param: BrpExpandedCollectionIndexParam) {
     const collectionManifestPath = resolve(manifestContainerPath, 'manifest.json');
     const collectionManifestUrl = UriGenerator.collectionId(collectionName);
 
-    await ensureDir(manifestContainerPath);
+    await fsExtra.ensureDir(manifestContainerPath);
 
     const documentManifestPath = resolve(manifestContainerPath, collectionName + '.json'); // /manifests/<collectionName>/<collectionName>.json
     const documentManifestUrl = UriGenerator.manifestId(collectionName);
@@ -119,7 +119,7 @@ async function createManifestV3(param: BrpExpandedCollectionIndexParam) {
         const ocrAnnotationUrl = config.manifestServerUrl + '/' + collectionName + '/' + 'annotations' + '/' + config.brpOcr + '/' + ocrManifestFilename;
         const ocrContainer = resolve(annotationContainerPath, config.brpOcr!);
 
-        await ensureDir(ocrContainer);
+        await fsExtra.ensureDir(ocrContainer);
 
 
         const ocrExtension = config.brpOcr === 'hocr' ? '.hocr' : '.xml'

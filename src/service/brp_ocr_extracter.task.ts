@@ -5,7 +5,7 @@ import {BrpCollectionIndexParam, BrpCollectionPage, BrpExpandedCollectionIndexPa
 import logger from "../lib/Logger.js";
 import {resolve, parse} from 'path';
 import config from "../lib/Config.js";
-import {copy, ensureDir, readdir, unlink, writeFile} from "fs-extra";
+import fsExtra from "fs-extra";
 import {spawn} from "child_process";
 import {runTask} from "../lib/Task.js";
 import {asyncForEach} from "../lib/Utils.js";
@@ -24,13 +24,13 @@ export default async function extractOcr(params: BrpCollectionIndexParam) {
 
     const ocrContainerPath = resolve(config.dataRootPath, config.collectionsRelativePath, 'ocr', params.name, 'hocr');
 
-    await ensureDir(ocrContainerPath);
+    await fsExtra.ensureDir(ocrContainerPath);
 
     /* Based on comments in neat_ocr_index.ts,
     a textfile with the images (line separated) is required by tesseract
      */
     const imageFiles = params.files.sort(pageNoSorter); // ensure correct ordering
-    let outputDirContents = await readdir(ocrContainerPath); // check for already generated hocr files
+    let outputDirContents = await fsExtra.readdir(ocrContainerPath); // check for already generated hocr files
 
     if (config.filesAlreadyExtracted) {
         logger.debug(`Skip extracting as it already exists according to config`);
@@ -89,7 +89,7 @@ export default async function extractOcr(params: BrpCollectionIndexParam) {
             }
         }
 
-        outputDirContents = await readdir(ocrContainerPath);
+        outputDirContents = await fsExtra.readdir(ocrContainerPath);
     }
 
     /* Collect necessary information of files created */
@@ -120,7 +120,7 @@ export default async function extractOcr(params: BrpCollectionIndexParam) {
 async function createIndexFile(params: BrpCollectionIndexParam) {
     const filename = indexFileFor(params);
     logger.info(`Writing image files to tesseract index file ${filename}`);
-    await writeFile(filename, params.files.sort(pageNoSorter).join('\n'));
+    await fsExtra.writeFile(filename, params.files.sort(pageNoSorter).join('\n'));
     return filename;
 }
 

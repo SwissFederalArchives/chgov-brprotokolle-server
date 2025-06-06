@@ -1,4 +1,4 @@
-FROM node:18-alpine AS builder
+FROM node:22-alpine AS builder
 
 RUN apt update -y
 RUN apt -y install curl git python3 g++ make clang cmake gcc libgd-dev libboost-dev
@@ -20,7 +20,7 @@ RUN make
 RUN ln -s /opt/iiif-server/pdfalto/pdfalto /usr/bin/pdfalto
 
 # Install global NPM tooling
-RUN npm install typescript@5.0.4 -g
+RUN npm install typescript@5.7.3 -g
 
 # Copy the application
 RUN mkdir -p /opt/iiif-server

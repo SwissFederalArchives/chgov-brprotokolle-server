@@ -5,6 +5,7 @@ const isEnabled = (value?: string): boolean => !value || value === '1' || value.
 export interface Config {
     env?: string;
     appInstance?: string;
+    provider: string;
     attribution?: string;
     hotFolderPath?: string;
     hotFolderPattern?: string;
@@ -136,6 +137,12 @@ const config: Config = {
         return Number(process.env.BRP_OCR_ALTO_EXTRACTION_MAX_PARALLEL_PROCESSES);
     })(),
 
+    provider: (_ => {
+        if (!process.env.IIIF_SERVER_PROVIDER || (process.env.IIIF_SERVER_PROVIDER === 'null'))
+            throw new Error('Provider is not defined');
+        return process.env.IIIF_SERVER_PROVIDER;
+    })(),
+
     imageServerUrl: (_ => {
         if (!process.env.IIIF_SERVER_IMAGE_SERVER_URL || (process.env.IIIF_SERVER_IMAGE_SERVER_URL === 'null'))
             throw new Error('Image server url is not defined');
@@ -171,22 +178,6 @@ const config: Config = {
         if (!process.env.IIIF_SERVER_ICONS_SERVER_URL || (process.env.IIIF_SERVER_ICONS_SERVER_URL === 'null'))
             throw new Error('Icons server url is not defined');
         return process.env.IIIF_SERVER_ICONS_SERVER_URL;
-    })(),
-
-    logoDimensions: (_ => {
-        if (!process.env.IIIF_SERVER_LOGO_DIM || (process.env.IIIF_SERVER_LOGO_DIM === 'null'))
-            return undefined;
-
-        const dimensions = process.env.IIIF_SERVER_LOGO_DIM.split(':');
-        return [parseInt(dimensions[0]), parseInt(dimensions[1])] as [number, number];
-    })(),
-
-    audioDimensions: (_ => {
-        if (!process.env.IIIF_SERVER_AUDIO_DIM || (process.env.IIIF_SERVER_AUDIO_DIM === 'null'))
-            return undefined;
-
-        const dimensions = process.env.IIIF_SERVER_AUDIO_DIM.split(':');
-        return [parseInt(dimensions[0]), parseInt(dimensions[1])] as [number, number];
     })(),
 
     viewerUrl: (_ => {

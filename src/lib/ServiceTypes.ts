@@ -48,7 +48,7 @@ export interface TopCollection {
     urlPattern: string;
     getId: (params: Record<string, string>) => string;
     getLabel: (params: Record<string, string>) => string;
-    getChildren: (params: Record<string, string>) => Promise<Item[]>;
+    getChildren: (params: Record<string, string>) => AsyncIterable<Item>;
 }
 
 export type IIIFMetadataHomepage = { id: string; label: string; }[];

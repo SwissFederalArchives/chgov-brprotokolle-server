@@ -4,11 +4,10 @@
     "target": "ES2022",
     "lib": [
       "dom",
-      "ES2022"
+      "ES2023"
     ],
-    "module": "ES2022",
-    "moduleResolution": "node",
-    "moduleDetection": "force",
+    "module": "node16",
+    "moduleResolution": "node16",
     "allowSyntheticDefaultImports": true,
     "esModuleInterop": true,
     "skipLibCheck": true,

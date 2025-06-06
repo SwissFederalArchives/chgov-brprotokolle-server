@@ -2,12 +2,7 @@ import config from '../../lib/Config.js';
 import getClient from '../../lib/ElasticSearch.js';
 import {Item} from '../../lib/ItemInterfaces.js';
 import {EmptyParams, TopCollection} from '../../lib/ServiceTypes.js';
-import {createItem, getAllRootItems, getItems, withItems} from '../../lib/Item.js';
-
-import {
-    AggregationsMultiBucketAggregateBase,
-    AggregationsStringRareTermsBucketKeys,
-} from '@elastic/elasticsearch/lib/api/types.js';
+import {createItem, getAllRootItems, getItems} from '../../lib/Item.js';
 
 const fromParam = (param: string): string => param.replaceAll('_', ' ');
 const toParam = (param: string): string => param.replaceAll(' ', '_');
@@ -18,23 +13,23 @@ export default async function getTopCollections(noParams?: EmptyParams): Promise
         urlPattern: '/top',
         getId: () => 'top',
         getLabel: () => config.attribution || 'Top',
-        getChildren: async () => [
-            createItem({
+        getChildren: async function* () {
+            yield createItem({
                 id: 'all',
                 collection_id: 'top',
                 label: 'All'
-            }),
-            createItem({
+            });
+            yield createItem({
                 id: 'format',
                 collection_id: 'top',
                 label: 'By format'
-            })
-        ]
+            });
+        }
     }, {
         urlPattern: '/all',
         getId: () => 'all',
         getLabel: () => 'All',
-        getChildren: () => withItems(getAllRootItems())
+        getChildren: () => getAllRootItems(['id', 'type', 'label'])
     }, {
         urlPattern: '/format',
         getId: () => 'format',
@@ -44,12 +39,12 @@ export default async function getTopCollections(noParams?: EmptyParams): Promise
         urlPattern: '/format/:format',
         getId: params => `format/${params.format}`,
         getLabel: params => capitalizeFirst(fromParam(params.format)),
-        getChildren: params => withItems(getItems(`formats:${fromParam(params.format)}`))
+        getChildren: params => getItems(`formats:${fromParam(params.format)}`)
     }];
 }
 
-async function getFormats(): Promise<Item[]> {
-    const formats = await getClient().search<unknown, Record<'formats', AggregationsMultiBucketAggregateBase<AggregationsStringRareTermsBucketKeys>>>({
+async function* getFormats(): AsyncIterable<Item> {
+    const formats = await getClient().search<unknown, Record<'formats', any>>({
         index: config.elasticSearchIndexItems,
         size: 0,
         aggs: {
@@ -62,10 +57,12 @@ async function getFormats(): Promise<Item[]> {
         }
     });
 
-    const buckets: AggregationsStringRareTermsBucketKeys[] = (formats.aggregations?.formats?.buckets as AggregationsStringRareTermsBucketKeys[]) || [];
-    return buckets.map(bucket => createItem({
-        id: `format/${toParam(bucket.key)}`,
-        collection_id: 'top',
-        label: capitalizeFirst(bucket.key)
-    }));
+    const buckets = (formats.aggregations?.formats?.buckets) || [];
+    for (const bucket of buckets) {
+        yield createItem({
+            id: `format/${toParam(bucket.key)}`,
+            collection_id: 'top',
+            label: capitalizeFirst(bucket.key)
+        });
+    }
 }

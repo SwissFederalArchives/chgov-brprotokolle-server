@@ -9,7 +9,7 @@ import logger from '../lib/Logger.js';
 
 import {existsSync, promises as fsPromises} from 'fs';
 import fsExtra from "fs-extra";
-import * as _ from "lodash";
+import cloneDeep from "lodash/cloneDeep.js";
 import Label4Lang = IIIFPresV3.Label4Lang;
 import LabelNoLang = IIIFPresV3.LabelNoLang;
 import {asyncForEach, asyncForEachM} from "../lib/Utils.js";
@@ -71,7 +71,7 @@ export default async function buildRootCollectionManifest() {
 
     // Building of collection(s)
 
-    const rootManifest = _.cloneDeep(COLLECTION_TEMPLATE);
+    const rootManifest = cloneDeep(COLLECTION_TEMPLATE);
     rootManifest.id = rootUri;
 
     await asyncForEachM(index, async (monthMap: Map<string, string[]>, year: string) => {
@@ -132,7 +132,7 @@ async function mockRootCollection(){
         return;
     }
 
-    let collectionManifest = _.cloneDeep(COLLECTION_TEMPLATE);
+    let collectionManifest = cloneDeep(COLLECTION_TEMPLATE);
 
     for (let year = 1848; year <= 1963; year++) {
         const yearlyContainerPath = resolve(manifestContainerPath, 'mock', '' + year);
@@ -203,7 +203,7 @@ const COLLECTION_TEMPLATE = {
     } as unknown as IIIFPresV3.Rendering;
 
 function createYearCollection(year: number) {
-    const manifest = _.cloneDeep(COLLECTION_TEMPLATE);
+    const manifest = cloneDeep(COLLECTION_TEMPLATE);
     const label = manifest.label as Label4Lang;
     label.de[0] = "[DE] Minutes of year " + year;
     label.fr[0] = "[FR] Minutes of year " + year;
@@ -214,7 +214,7 @@ function createYearCollection(year: number) {
 }
 
 function createMonthCollection(year: number, monthOneIndex: number) {
-    const manifest = _.cloneDeep(COLLECTION_TEMPLATE);
+    const manifest = cloneDeep(COLLECTION_TEMPLATE);
     const label = manifest.label as Label4Lang;
     label.de[0] = "[DE] Minutes of year " + year + " and month " + monthOneIndex;
     label.fr[0] = "[FR] Minutes of year " + year + " and month " + monthOneIndex;
@@ -225,7 +225,7 @@ function createMonthCollection(year: number, monthOneIndex: number) {
 }
 
 function createYearCollectionEntry(year: number) {
-    const manifest = _.cloneDeep(MANIFEST_TEMPLATE) as IIIFPresV3.ManifestEntry;
+    const manifest = cloneDeep(MANIFEST_TEMPLATE) as IIIFPresV3.ManifestEntry;
     manifest.id = UriGenerator.yearCollectionId(year);
     manifest.type = 'Collection';
     manifest.navDate = `${year}-01-01T00:00:00Z`; // month=01, dayOfMonth=01 is hardcoded
@@ -239,7 +239,7 @@ function createYearCollectionEntry(year: number) {
 
 
 function createMonthCollectionEntry(year: number, monthOneIndex: number) {
-    const manifest = _.cloneDeep(MANIFEST_TEMPLATE) as IIIFPresV3.ManifestEntry;
+    const manifest = cloneDeep(MANIFEST_TEMPLATE) as IIIFPresV3.ManifestEntry;
     manifest.id = UriGenerator.monthCollectionId(year, monthOneIndex);
     manifest.type = 'Collection';
     manifest.navDate = `${year}-${String(monthOneIndex).padStart(2, '0')}-01T00:00:00Z`; // dayOfMonth=01 is hardcoded
@@ -252,7 +252,7 @@ function createMonthCollectionEntry(year: number, monthOneIndex: number) {
 }
 
 function createMockManifestEntry(year: number, monthOneIndex: number, index: number): IIIFPresV3.ManifestEntry {
-    const manifest = _.cloneDeep(MANIFEST_TEMPLATE) as IIIFPresV3.ManifestEntry;
+    const manifest = cloneDeep(MANIFEST_TEMPLATE) as IIIFPresV3.ManifestEntry;
     manifest.navDate = `${year}-${String(monthOneIndex).padStart(2, '0')}-${String(index).padStart(2, '0')}T00:00:00Z`;
     const label = manifest.label as Label4Lang;
     label.de[0] = `[DE] Minutes: ${index} ${MONTHS[monthOneIndex - 1]} ${year}`;
@@ -263,7 +263,7 @@ function createMockManifestEntry(year: number, monthOneIndex: number, index: num
 }
 
 function createManifestEntry(ais: string, navDate: string, meta: AdsMetadata){
-    const manifest = _.cloneDeep(MANIFEST_TEMPLATE) as IIIFPresV3.ManifestEntry;
+    const manifest = cloneDeep(MANIFEST_TEMPLATE) as IIIFPresV3.ManifestEntry;
     manifest.id = UriGenerator.manifestId(ais);
     manifest.navDate = navDate;
     manifest.label = IIIFUtils.buildLabel(
@@ -282,7 +282,7 @@ function createManifestEntry(ais: string, navDate: string, meta: AdsMetadata){
 function createMockRenderingEntries(lbl: string): IIIFPresV3.Rendering[] {
     const renderings: IIIFPresV3.Rendering[] = [];
     for (let i = 0; i < 4; i++) {
-        const rendering = _.cloneDeep(RENDERING_TEMPLATE) as IIIFPresV3.Rendering;
+        const rendering = cloneDeep(RENDERING_TEMPLATE) as IIIFPresV3.Rendering;
         rendering.id = 'https://www.recherche.bar.admin.ch/recherche/#/de/archiv/einheit/32321128'; // mock
         rendering.label = {none: [lbl]} as LabelNoLang;
         rendering.language = [LANGUAGE_IDENTIFIERS[i]];

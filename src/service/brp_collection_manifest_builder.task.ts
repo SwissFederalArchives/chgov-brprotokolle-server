@@ -1,6 +1,6 @@
 import {
     BrpRootCollectionIndexParam, IIIFPresV3
-} from "./brp/brp.types";
+} from "./brp/brp.types.js";
 
 import {parse, resolve} from 'path';
 

@@ -1,7 +1,7 @@
 import {resolve} from "path";
 import config from "../../lib/Config.js";
 import {ensureDir} from "fs-extra";
-import {IIIFPresV3} from "./brp.types";
+import {IIIFPresV3} from "./brp.types.js";
 import {EXT_BASE_URL, EXT_LANG_ARR, EXT_LANG_DESCRIPTION, LANGUAGE_IDENTIFIERS, OCR_LABELS} from "./i18n.utils.js";
 import Rendering = IIIFPresV3.Rendering;
 import {AisLookup} from "../../lib/AisLookup.js";

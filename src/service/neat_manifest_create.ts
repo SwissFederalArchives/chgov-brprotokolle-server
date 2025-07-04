@@ -10,7 +10,6 @@ import * as _ from "lodash";
 import * as sizeOf from "image-size";
 import {promisify} from "util";
 
-const sizeOfAsync = promisify(sizeOf.imageSize);
 const { readdir, writeFile } = fsPromises;
 
 const COLLECTION_TEMPLATE = {
@@ -241,11 +240,11 @@ async function getDocumentManifest(id: string, label: string, collectionManifest
 }
 
 async function getImageManifest(imageUrl: string, imagePath: string) : Promise<any> {
-    const size = await sizeOfAsync(imagePath),
-        sequence = _.cloneDeep(IMAGE_TEMPLATE);
-
-    const width = Number(size!.width),
-        height = Number(size!.height);
+    const buffer = await fsPromises.readFile(imagePath);
+    const size = sizeOf.imageSize(buffer) as { width: number; height: number };
+    const width = size.width;
+    const height = size.height;
+    const sequence = _.cloneDeep(IMAGE_TEMPLATE);
 
     sequence['@id'] = imageUrl;
     sequence['width'] = width;

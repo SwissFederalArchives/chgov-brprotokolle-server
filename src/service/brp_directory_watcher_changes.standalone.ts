@@ -11,7 +11,7 @@ import * as chokidar from 'chokidar';
 import fsExtra from "fs-extra";
 import moment from 'moment';
 import {AdsLookupMetadataTable} from "../lib/AdsLookupMetadataTable.js";
-import {BrpBaseCollectionIndexParam, BrpCollectionIndexParam, BrpExpandedCollectionIndexParam} from "./brp/brp.types";
+import {BrpBaseCollectionIndexParam, BrpCollectionIndexParam, BrpExpandedCollectionIndexParam} from "./brp/brp.types.js";
 import {runTask} from "../lib/Task.js";
 import * as path from "path";
 import {AisLookup} from "../lib/AisLookup.js";

@@ -28,8 +28,8 @@ import {
     ADS_VOL_TAG,
     ADS_YEAR_ATTR,
     AdsMetadata
-} from "./brp/brp.types";
-import parse, {XmlDocument, XmlNode} from "fsp-xml-parser";
+} from "./brp/brp.types.js";
+import {parse, XmlDocument, XmlNode} from "fsp-xml-parser";
 import {AdsCsvStreamWriter} from "../lib/AdsLookupStreamWriter.js";
 import {CsvStreamWriter} from "../lib/CsvStreamWriter.js";
 import {applyFix, MANUAL_FIX_ADS_ID} from "./brp/index-fixes.utils.js";

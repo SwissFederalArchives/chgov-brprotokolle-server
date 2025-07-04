@@ -5,7 +5,7 @@ import logger from '../lib/Logger.js';
 import {runTask} from '../lib/Task.js';
 import {spawn} from "child_process";
 import {existsSync, rename, promises as fsPromises} from 'fs';
-import {BrpBaseCollectionIndexParam, BrpCollectionIndexParam} from "./brp/brp.types";
+import {BrpBaseCollectionIndexParam, BrpCollectionIndexParam} from "./brp/brp.types.js";
 import {AIS_LOOKUP, pageNoOf, pageNumber, PathUtils, toTitlePageNo} from "./brp/brp.utils.js";
 import * as fs from "fs";
 

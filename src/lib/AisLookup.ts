@@ -1,7 +1,7 @@
 import logger from "./Logger.js";
 import {readFileSync} from "fs";
-import parse from "csv-parse";
-import {AisLookupRecord} from "../service/brp/brp.types";
+import {parse} from 'csv-parse';
+import {AisLookupRecord} from "../service/brp/brp.types.js";
 import {AdsLookupMetadataTable} from "./AdsLookupMetadataTable.js";
 
 export class AisLookup {

@@ -2,7 +2,7 @@
  * Moves files to the output directory
  */
 
-import {BrpCollectionIndexParam, BrpCollectionPage, BrpExpandedCollectionIndexParam} from "./brp/brp.types";
+import {BrpCollectionIndexParam, BrpCollectionPage, BrpExpandedCollectionIndexParam} from "./brp/brp.types.js";
 import logger from '../lib/Logger.js';
 import {runTask} from '../lib/Task.js';
 import {resolve} from "path";

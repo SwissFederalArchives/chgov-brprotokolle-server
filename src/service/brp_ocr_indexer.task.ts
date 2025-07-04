@@ -1,7 +1,7 @@
 import {
     AdsMetadata,
     BrpExpandedCollectionIndexParam
-} from "./brp/brp.types";
+} from "./brp/brp.types.js";
 
 import {resolve, parse} from 'path';
 

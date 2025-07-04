@@ -1,8 +1,8 @@
 import {readFileSync} from "fs";
 import {AdsCsvStreamWriter} from "./AdsLookupStreamWriter.js";
-import parse from "csv-parse";
+import {parse} from 'csv-parse';
 import logger from "./Logger.js";
-import {AdsMetadata} from "../service/brp/brp.types";
+import {AdsMetadata} from "../service/brp/brp.types.js";
 
 /**
  * The master index lookup for ADS entries.

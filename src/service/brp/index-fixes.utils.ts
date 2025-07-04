@@ -1,4 +1,4 @@
-import {AdsMetadata} from "./brp.types";
+import {AdsMetadata} from "./brp.types.js";
 
 export const MANUAL_FIX_ADS_ID : Map<string, string> = new Map([
     ["70016583","nodot"], // Date broken: no dot for month

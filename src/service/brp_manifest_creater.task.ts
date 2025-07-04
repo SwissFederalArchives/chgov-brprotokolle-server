@@ -62,7 +62,6 @@ import LabelNoLang = IIIFPresV3.LabelNoLang;
 import PartOf = IIIFPresV3.PartOf;
 import createSearchService = IIIFUtils.createSearchService;
 
-const sizeOfAsync = promisify(sizeOf.imageSize);
 const {writeFile} = fsPromises;
 
 
@@ -240,9 +239,10 @@ function buildDownloadOcrRendering(id: string): Rendering[] {
 }
 
 async function buildCanvas(canvasId: string, collectionName: string, imageUrl: string, imagePath: string, ocrUrl: string, ocrPath: string, manifestUrl: string): Promise<Canvas> {
-    const size = await sizeOfAsync(imagePath);
-    const width = Number(size!.width);
-    const height = Number(size!.height);
+    const buffer = await fsPromises.readFile(imagePath);
+    const size = sizeOf.imageSize(buffer) as { width: number; height: number };
+    const width = size.width;
+    const height = size.height;
     const pageNo = pageNoOfUrl(imageUrl);
     return {
         id: imageUrl, // Example: https://example.org/iiif/book1/canvas/p2

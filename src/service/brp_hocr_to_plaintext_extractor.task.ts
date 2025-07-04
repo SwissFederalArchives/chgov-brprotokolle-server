@@ -1,4 +1,4 @@
-import {BrpExpandedCollectionIndexParam} from "./brp/brp.types";
+import {BrpExpandedCollectionIndexParam} from "./brp/brp.types.js";
 import logger from "../lib/Logger.js";
 import fsExtra from "fs-extra";
 import {parse} from "node-html-parser"; // Apparently the fastest html parsers

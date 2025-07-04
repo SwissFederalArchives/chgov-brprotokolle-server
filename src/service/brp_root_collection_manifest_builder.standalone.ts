@@ -34,7 +34,7 @@ export default async function buildRootCollectionManifest() {
     const rootFile = await PathUtils.rootCollectionFile();
 
     if(existsSync(rootFile)){
-        logger.warning("Skipping root collection creation, as it already exists. Please delete the files beforehand to regenerate");
+        logger.warn("Skipping root collection creation, as it already exists. Please delete the files beforehand to regenerate");
     }
 
     const index: Map<string, Map<string, string[]>> = new Map();

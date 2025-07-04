@@ -62,6 +62,7 @@
     "pdf-lib": "1.17.1",
     "range_check": "3.2.0",
     "redis": "4.7.0",
+    "roman-numbers": "1.0.2",
     "winston": "3.17.0"
   },
   "devDependencies": {

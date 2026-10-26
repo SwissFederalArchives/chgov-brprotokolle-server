@@ -4,7 +4,7 @@ import Router from '@koa/router';
 import logger from '../lib/Logger.js';
 import config from '../lib/Config.js';
 import axios from "axios";
-import * as _ from "lodash";
+import lodash from "lodash";
 import * as querystring from "querystring";
 import * as crypto from "crypto";
 
@@ -88,10 +88,10 @@ async function querySolr(query: string, fq: string) : Promise<object> {
             ocrHighlighting = response.data.ocrHighlighting,
             docs:any[] = response.data.response.docs;
 
-        _.forIn(ocrHighlighting, function (document: any, documentId: string) {
+        lodash.forIn(ocrHighlighting, function (document: any, documentId: string) {
 
             const doc = docs.find(d => d.id === documentId );
-            _.each(document.ocr_text.snippets, function (snippet: any) {
+            lodash.each(document.ocr_text.snippets, function (snippet: any) {
                 snippet.documentId = documentId;
                 snippet.collectionId = doc.source;
                 out.snippets.push(snippet);
@@ -107,22 +107,22 @@ async function querySolr(query: string, fq: string) : Promise<object> {
 }
 
 async function makeResponse(hlresp: any, ignored_fields: any[], volId: string, query: string) : Promise<object> {
-    let doc = _.cloneDeep(RESPONSE_TEMPLATE);
+    let doc = lodash.cloneDeep(RESPONSE_TEMPLATE);
 
     doc['@id'] = config.manifestSearchUrl + volId + '?q=' + query;
     doc.within.total = hlresp['numTotal'];
     doc.within.ignored = ignored_fields;
 
-    _.each(hlresp.snippets, function (snippet: any, idx: number){
+    lodash.each(hlresp.snippets, function (snippet: any, idx: number){
         const match = snippet.text.match(EM_PATTERN),
             text = match[1],
             before = snippet.text.substr(0, match.index),
             after = snippet.text.substr(match.index + match[0].length);
 
-        _.each(snippet.highlights, function (highlight:any) {
+        lodash.each(snippet.highlights, function (highlight:any) {
             let annoIds: string[] = [];
 
-            _.each(highlight, function (highlightBox:any) {
+            lodash.each(highlight, function (highlightBox:any) {
                 /**
                  * AB 29.12.2022: Hotfix due to improperly scaled ocr information with pdfalto tool
                  */

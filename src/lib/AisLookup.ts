@@ -57,7 +57,7 @@ export class AisLookup {
             columns: this.COLUMNS
         }, ((err, records) => {
             if (err) {
-                logger.warning(`${this.PREFIX} An issue occurred during the reading of AIS lookup: ${JSON.stringify(err)}`);
+                logger.warn(`${this.PREFIX} An issue occurred during the reading of AIS lookup: ${JSON.stringify(err)}`);
             } else {
                 const items = records as AisLookupRecord[];
                 logger.info(`${this.PREFIX} Successfully read & parsed ${items.length} AIS LOOKUP records`);

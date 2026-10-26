@@ -276,18 +276,20 @@ export const allServices: Service[] = [{
         name: 'brp-hocr-to-plaintext-extracter',
         loadService: async () => (await import('../service/brp_hocr_to_plaintext_extractor.task.js')).default
     }]
-}
+},
     /*
-    * Definition of brp-ads-indexer service Single use, produces ads-index.csv
-    * disabled here, to prevent unnecessary rewrites
+    * Single-use brp-ads-indexer service that produces ADS index CSV files.
+    * Runs only when brp-ads-indexer is selected in IIIF_SERVER_SERVICES.
     */
-    /*
+
     {
-        name: 'brp-ads-indexer',
         type: 'ads-indexer',
         runAs: 'standalone',
-        getService: () => require('../service/brp_ads_signature_indexer.standalone').default
-    }*/
+        implementations: [{
+            name: 'brp-ads-indexer',
+            loadService: async () => (await import('../service/brp_ads_signature_indexer.standalone.js')).default
+        }]
+    }
 ];
 
 export let isRunningWeb: boolean = config.services.find(name => name.toLowerCase() === 'web') != undefined;

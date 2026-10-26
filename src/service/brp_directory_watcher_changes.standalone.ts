@@ -420,11 +420,11 @@ async function buildMbrpParametersForYear(fullPathYear: string): Promise<Array<B
 }
 
 /**
- * Validates if the given path is likely a ADS ID (is 8 chars long and starts with 700)
+ * Validates an ADS ID containing at least 8 digits and starting with 700.
  * @param name
  */
 function validateAdsIdFormally(name: string) {
-    return name.length === 8 && name.startsWith('700');
+    return name.length >= 8 && name.startsWith('700') && !/\D/.test(name);
 }
 
 /**

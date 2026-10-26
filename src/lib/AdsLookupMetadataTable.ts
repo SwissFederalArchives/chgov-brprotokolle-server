@@ -74,7 +74,7 @@ export class AdsLookupMetadataTable {
             columns: header => header.map((col: string) => AdsCsvStreamWriter.mapHeadersToAdsMetdataKeys(col))
         }, ((err, records) => {
             if (err) {
-                logger.warning(`An issue occurred, during reading of ADS Index: ${JSON.stringify(err)}`);
+                logger.warn(`An issue occurred, during reading of ADS Index: ${JSON.stringify(err)}`);
             } else {
                 logger.debug('Reached before store');
                 this.data = records as AdsMetadata[];
@@ -102,13 +102,13 @@ export class AdsLookupMetadataTable {
             if (this.metadataMap.has(id)) {
                 return this.metadataMap.get(id)!;
             } else {
-                throw new Error("Unrecognized ADS ID: " + id);
+                throw new Error("700 Unrecognized ADS ID: " + id);
             }
         } else if (id.startsWith('CH-BAR')) {
             if (this.signatureMap.has(id)) {
                 return this.metadataMap.get(this.signatureMap.get(id)!)!;
             } else {
-                throw new Error("Unrecognised signature: " + id);
+                throw new Error("CH-BAR Unrecognised signature: " + id);
             }
         } else {
             throw new Error("Unrecognised id type: " + id);
